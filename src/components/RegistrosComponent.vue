@@ -22,6 +22,7 @@
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
           <q-btn @click="consultar(props.row)" label="Consultar" color="primary"/>
+          <q-btn @click="deleteRecord(props.row.idCard)" label="Eliminar" color="negative" style="margin-left: 10px;" />
 
     <q-dialog v-model="persistent" persistent transition-show="scale" transition-hide="scale">
       <q-card class="black text-white" style="width: 3000px">
@@ -56,13 +57,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore'
+import { collection, getDocs, doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore'
 import { firestore } from 'boot/firebase'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
 const filteredRecords = ref([])
-const records = ref([])
+
 const text = ref('')
 const persistent = ref(false)
 const selectedRow = ref(null) // New ref to hold selected row data
@@ -76,15 +77,72 @@ const columns = [
   { name: 'actions', label: 'Acciones', align: 'center' }
 ]
 
+const records = ref([])
+
+const deleteRecord = async (idCard) => {
+  const index = records.value.findIndex(record => record.idCard === idCard)
+
+  if (index !== -1) {
+    const archivedRecord = records.value[index] // Guardar el registro a archivar
+
+    // Eliminar el registro de la lista activa
+    records.value.splice(index, 1)
+
+    // Guardar el registro archivado en Firestore
+    const archivedCollectionRef = collection(firestore, 'archivedRecords')
+    const archivedDocRef = doc(archivedCollectionRef, archivedRecord.idCard)
+
+    try {
+      await setDoc(archivedDocRef, archivedRecord) // Guarda el registro en Firestore
+      console.log('Registro archivado en Firestore:', archivedRecord)
+
+      // También eliminar el registro de la colección activa
+      const recordsCollectionRef = collection(firestore, 'DatosPersonales') // Cambia 'DatosPersonales' por tu colección real
+      const recordDocRef = doc(recordsCollectionRef, idCard)
+      await deleteDoc(recordDocRef) // Eliminar el documento de la colección activa
+
+      console.log('Registro eliminado de la colección activa:', idCard)
+
+      // Actualiza la lista de registros activos después de archivar
+      await loadRecords()
+    } catch (error) {
+      console.error('Error al archivar o eliminar el registro:', error)
+    }
+
+    router.push({
+      path: '/archivosmuertos',
+      query: { archivedRecord: JSON.stringify(archivedRecord) }
+    })
+
+    console.log('Registro archivado:', archivedRecord)
+  }
+}
+
+const loadRecords = async () => {
+  try {
+    const recordsCollection = collection(firestore, 'DatosPersonales') // Cambia 'DatosPersonales' por tu colección real
+    const recordsSnapshot = await getDocs(recordsCollection)
+
+    // Cargar solo los registros que no están archivados
+    records.value = recordsSnapshot.docs.map(doc => ({
+      idCard: doc.id,
+      ...doc.data()
+    }))
+
+    console.log('Registros activos:', records.value) // Para verificar los datos cargados
+  } catch (error) {
+    console.error('Error al cargar registros:', error)
+  }
+}
+
 const consultar = (rowData) => {
   persistent.value = true
-  selectedRow.value = rowData // Assuming selectedRow is defined as ref
+  selectedRow.value = rowData
 }
 
 async function acceder (rowData) {
   try {
-    console.log('Consultando datos para idCard:', rowData.idCard) // Ensure this logs the correct idCard
-
+    console.log('Consultando datos para idCard:', rowData.idCard)
     const docRef = doc(firestore, 'DatosPersonales', rowData.idCard)
     const motivosC = doc(firestore, 'MotivosConsulta', rowData.idCard)
 
@@ -140,6 +198,7 @@ async function acceder (rowData) {
 
 onMounted(() => {
   getRecords()
+  loadRecords()
 })
 
 const getRecords = async () => {

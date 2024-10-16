@@ -15,7 +15,9 @@ const routes = [
       { path: '/newhistory', component: () => import('pages/NewHistory.vue'), meta: { requiresAuth: true } },
       { path: '/actualizar', component: () => import('pages/ActualizacionPage.vue'), meta: { requiresAuth: true } },
       { path: '/usuarios', component: () => import('pages/UsuariosPage.vue'), meta: { requiresAuth: true } },
-      { path: '/registros', component: () => import('pages/RegistrosPage.vue'), meta: { requiresAuth: true } }
+      { path: '/registros', component: () => import('pages/RegistrosPage.vue'), meta: { requiresAuth: true } },
+      { path: '/archivosmuertos', component: () => import('pages/ArchivosMuertosPage.vue'), meta: { requiresAuth: true } },
+      { path: '/configuracion', component: () => import('pages/ConfiguracionPage.vue'), meta: { requiresAuth: true } }
     ]
   },
   // Siempre deja esto como el último,

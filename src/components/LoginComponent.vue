@@ -58,22 +58,18 @@ const passw = ref('')
 const emailError = ref(false)
 const passError = ref(false)
 const errorMessage = ref('')
-const userRole = ref('') // Reactive property to store user role
+const userRole = ref('')
+const isPwd = false
 
-// Función para navegar a la página de registro
 const irARegistro = () => {
-  router.push('/registro') // Cambia '/registro' por la ruta correcta de tu página de registro
+  router.push('/registro')
 }
 
-// Función para verificar las credenciales del usuario
-
 const login = async () => {
-  // Resetear errores
   emailError.value = false
   passError.value = false
   errorMessage.value = ''
 
-  // Validar campos
   if (!email.value) {
     emailError.value = true
     errorMessage.value = 'El email es requerido.'
@@ -119,13 +115,12 @@ const login = async () => {
         console.log('Entraste como usuario común')
       }
 
-      // Navegar al menú después de un inicio de sesión exitoso
       router.push('/menu')
     } else {
       console.log('El usuario no existe en la base de datos')
     }
   } catch (error) {
-    // Manejo de errores de autenticación
+    console.error('Error durante la autenticación:', error)
     switch (error.code) {
       case 'auth/user-not-found':
         errorMessage.value = 'Usuario no encontrado.'

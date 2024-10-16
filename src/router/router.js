@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+/* import { createRouter, createWebHistory } from 'vue-router'
 import { getAuth } from 'firebase/auth' // Asegúrate de importar Firebase Auth
 import routes from './routes' // Asegúrate de importar tus rutas
 
@@ -22,4 +22,4 @@ router.beforeEach((to, from, next) => {
   }
 })
 
-export default router
+export default router */

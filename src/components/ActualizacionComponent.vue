@@ -11,8 +11,8 @@
 
     <div>
       <q-btn @click="showBtn = true" class="q-mb-md custom-btn" color="green" style="width: 400px; height: 100px; margin-left: 130%;">
-        <q-icon name="add" size="40px" class="zoom-icon" /> <!-- Aumenta el tamaño del ícono -->
-        <span style="margin-left: 10px;">Crear Nueva Evolución</span> <!-- Texto al lado del ícono -->
+        <q-icon name="add" size="40px" class="zoom-icon" />
+        <span style="margin-left: 10px;">Crear Nueva Evolución</span>
       </q-btn>
     </div>
 
@@ -31,7 +31,6 @@
         <template v-slot:body-cell-actions="props">
           <q-td :props="props">
             <q-btn @click="ver(props.row)" label="Consultar" color="green" />
-            <q-btn @click="impr(props.row.id)" label="Eliminar" color="negative" />
           </q-td>
         </template>
     </q-table>
@@ -474,13 +473,8 @@ if (storedInterconsulta) {
 }
 
 const generateInterconsulta = () => {
-  // Almacena el valor actual en localStorage antes de incrementarlo
   localStorage.setItem('currentInterconsulta', currentInterconsulta.value)
-
-  // Genera el nuevo número de interconsulta
   Interconsulta.value = `#${currentInterconsulta.value}`
-
-  // Incrementa el contador para la próxima vez
   currentInterconsulta.value++
 }
 
@@ -491,7 +485,6 @@ const getEvoluciones = async (userDocRef) => {
 
     evolucionn.value = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
 
-    // Actualizamos los registros filtrados para mostrar en la tabla
     filteredRecords.value = evolucionn.value
   } catch (error) {
     console.error('Error al obtener las evoluciones:', error)
@@ -500,17 +493,15 @@ const getEvoluciones = async (userDocRef) => {
 
 async function save () {
   try {
-    const userId = cedula.value // Usar el ID o cédula del paciente
-
+    const userId = cedula.value
     const userDocRef = doc(firestore, 'DatosPersonales', userId)
     const evolucionesRef = collection(userDocRef, 'Evolucion')
 
-    // Crear un nuevo documento en la subcolección 'Evolucion'
     await setDoc(doc(evolucionesRef), {
       Interconsulta: Interconsulta.value,
-      cedula: cedula.value, // Asegúrate de acceder a .value
-      edad: edad.value, // Asegúrate de acceder a .value
-      fechaN: fechaN.value, // Asegúrate de acceder a .value
+      cedula: cedula.value,
+      edad: edad.value,
+      fechaN: fechaN.value,
       subjetivos: subjetivos.value,
       objetivo: objetivo.value,
       analisi: analisi.value,
@@ -520,21 +511,18 @@ async function save () {
     })
     generateInterconsulta()
     limpiarCampos()
-    await getEvoluciones(userDocRef) // Recargar las evoluciones después de guardar
+    await getEvoluciones(userDocRef)
   } catch (error) {
     console.error('Error al guardar evolución:', error)
   }
 }
 function limpiarCampos () {
-  // Limpiar todos los campos excepto los especificados
   subjetivos.value = ''
   objetivo.value = ''
   analisi.value = ''
   plant.value = ''
   medicoE.value = ''
   fecha.value = ''
-
-  // Si tienes otros campos que deseas limpiar, añádelos aquí
 }
 
 const salir = () => {
@@ -551,7 +539,7 @@ const patras = () => {
 const getRecords = async () => {
   const querySnapshot = await getDocs(collection(firestore, 'Evolucion'))
   evolucionn.value = querySnapshot.docs.map(doc => doc.data())
-  filteredRecords.value = evolucionn.value // Inicialmente, mostrar todos los registros
+  filteredRecords.value = evolucionn.value
   console.log(evolucionn.value)
 }
 
@@ -561,31 +549,31 @@ onMounted(() => {
 
 onMounted(() => {
   const userDocRef = doc(firestore, 'DatosPersonales', idCard.value)
-  getEvoluciones(userDocRef) // Cargar evoluciones al montar el componente
+  getEvoluciones(userDocRef)
 })
 </script>
 
 <style scoped>
 .custom-btn {
-  background-color: rgba(73, 164, 170); /* Color azur with transparency */
-  width: 20%; /* Ancho del rectángulo */
-  padding: 10px; /* Espaciado interno */
-  border-radius: 80px; /* Bordes redondeados (opcional) */
+  background-color: rgba(73, 164, 170);
+  width: 20%;
+  padding: 10px;
+  border-radius: 80px;
   margin-left: 5%;
   margin-right: 5%;
   margin-top: 2%;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); /* Shadow for depth */
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .custom-btn:hover {
-  background-color: rgba(70, 165, 168, 0.9); /* Darker shade on hover */
+  background-color: rgba(70, 165, 168, 0.9);
   transform: translateY(-10px);
 }
 .custom-dialog {
-  max-width:1000%; /* Ancho del rectángulo */
-  padding: 50px; /* Espaciado interno */
-  border-radius: 10px; /* Bordes redondeados (opcional) */
+  max-width:1000%;
+  padding: 50px;
+  border-radius: 10px;
 }
 
 .btn-image {

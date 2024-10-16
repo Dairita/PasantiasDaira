@@ -82,12 +82,14 @@ const linksList = [
     title: 'Archivos Muertos',
     caption: 'Crear',
     icon: 'library_add',
+    link: '/archivosmuertos',
     role: ['admin'] // Only visible to admin
   },
   {
     title: 'Configuracion',
     caption: 'Crear',
     icon: 'library_add',
+    link: '/configuracion',
     role: ['admin, user'] // Only visible to admin
   }
 ]

@@ -21,3 +21,6 @@ const auth = getAuth(app)
 const firestore = getFirestore(app)
 
 export { auth, firestore }
+const db = getFirestore(app)
+
+export { db }
