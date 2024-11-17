@@ -1,40 +1,37 @@
 <template>
-  <div class="q-pa-md" style="height: 100vh; display: flex; flex-direction: column; overflow: auto; align-items: center;">
-    <q-card  class="my-card bg-white text-black" style="margin-bottom: 5%; margin-top: 3%; border-radius: 50px; border: 20px solid #007A7C; opacity: 100; width: 90%; margin-top: 0%;">
-      <div class="row justify-content-center q-mb-md" style=" align-items: center; margin-top: 5%;">
-        <img alt="Quasar logo" src="src/assets/images-removebg-preview.png" style="max-width: 1300px; max-height: 1300px; margin-left: 4%; margin-right: 50%; margin-top: -5%; flex-wrap: wrap;"/>
-      </div>
-      <div style="text-align: center; margin-top: -12%; margin-left: -20%;">
-        <h5 style="margin: 0;"><strong>Fundación</strong></h5>
-        <h4 style="margin: 0;"><strong>Hospital Adventista de Venezuela</strong></h4>
-        <h6 style="align-self: flex-start; margin-top: 5px;"><strong>Rif J-08517758-2</strong></h6>
-      </div>
+  <div class="q-pa-md" style="height: 100vh; display: flex; flex-direction: column; align-items: center;">
+    <q-card class="my-card text-black" style="margin-bottom: 5%; min-width: 100%; background-image: linear-gradient( #1989, #3333);">
+      <q-card class="my-card text-black" style="margin-left: 25%; width: 100vh; height: 100vh; background-color: transparent; border: 2px solid white;">
 
     <q-card-section>
-    <div class="text-h6" style="margin: 3%;">HISTORIA CLINICA</div>
+    <div class="text-h5" style="margin: 3%; ">HISTORIA CLINICA</div>
     </q-card-section>
 
-<form id="app" @submit="checkForm" action="https://vuejs.org/" method="post">
+<div v-if="currentStep === 1">
+ <form id="app" @submit="checkForm" action="https://vuejs.org/" method="post">
   <q-card-section style="margin: 5%; margin-top: -3%;">
-      <div class="text-h7">Datos personales</div>
-
+      <div class="text-h6">Datos personales</div>
       <q-card-section style="text-align: left;">
         <div class="q-gutter-md" style="display: flex; flex-wrap: wrap;">
           <div style="flex: 1; min-width: 200px; margin-right: 10px;">
-            <q-input ref="inputRef" filled v-model="name" label="Nombre" maxlength="20" :class="{'error': nameError}" :dense="dense" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);"/>
+            <q-input ref="inputRef" filled v-model="name" label="Nombre" maxlength="20" :class="{'error': nameError}" :dense="dense" style="border-radius: 5px; background-color: rgba(0, 122, 124);"/>
             <span v-if="nameError" class="error-message">Llena el campo correctamente</span>
           </div>
           <div style="flex: 1; min-width: 200px; margin-right: 10px;">
-            <q-input ref="inputRef" filled v-model="surname" label="Apellido" maxlength="20" :class="{'error': surnameError}" :dense="dense" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);"/>
+            <q-input ref="inputRef" filled v-model="surname" label="Apellido" maxlength="20" :class="{'error': surnameError}" :dense="dense" style="border-radius: 5px; background-color: rgba(0, 122, 124);"/>
             <span v-if="surnameError" class="error-message">Llena el campo correctamente</span>
           </div>
           <div style="flex: 1; min-width: 200px; margin-right: 10px;">
-            <q-input ref="inputRef" filled v-model="age" label="Edad" type="number" min="0" max="110" :class="{'error': ageError}" :dense="dense" @input="validateAge" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);"/>
+            <q-input ref="inputRef" filled v-model="age" label="Edad" type="number" min="0" max="110" :class="{'error': ageError}" :dense="dense" @input="validateAge" style="border-radius: 5px; background-color: rgba(0, 122, 124);"/>
             <span v-if="ageError" class="error-message">Llena el campo correctamente</span>
           </div>
           <div style="flex: 1; min-width: 200px;">
-            <q-input ref="inputRef" filled v-model="birthDate" label="Fecha de Nacimiento" mask="##/##/####" :class="{'error': birthDateError}" :dense="dense" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);"/>
-            <span v-if="birthDateError" class="error-message">Llena el campo correctamente</span>
+            <q-input v-model="formattedDate" style="border-radius: 5px; background-color: rgba(0, 122, 124);"
+            label="Fecha de Nacimiento" readonly @click="showDatePicker = true" hint="Haz clic para seleccionar una fecha" :error="birthDateError"/>
+            <q-popup-proxy v-model="showDatePicker" transition-show="scale" transition-hide="scale">
+              <q-date v-model="birthDate" mask="DD/MM/YYYY" @input="onDateSelected" :options="dateOptions"/>
+            </q-popup-proxy>
+            <span v-if="birthDateError" class="error-message">Fecha inválida</span>
           </div>
         </div>
       </q-card-section>
@@ -42,16 +39,15 @@
       <q-card-section style="text-align: center;">
         <div class="q-gutter-md" style="display: flex; flex-wrap: wrap; justify-content: center;">
           <div style="flex: 1; min-width: 200px; margin-right: 10px;">
-            <q-input ref="inputRef" filled v-model="idCard" label="Cédula" maxlength="10" mask="##.###.####" :class="{'error': idCardError}" :dense="dense" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);"/>
+            <q-input ref="inputRef" filled v-model="idCard" label="Cédula" maxlength="10" mask="##.###.####" :class="{'error': idCardError}" :dense="dense" style="border-radius: 5px; background-color: rgba(0, 122, 124);"/>
             <span v-if="idCardError" class="error-message">Llena el campo correctamente</span>
           </div>
           <div style="flex: 1; min-width: 200px; margin-right: 10px;">
-            <q-input ref="inputRef" filled v-model="address" label="Dirección" :class="{'error': addressError}" :dense="dense" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);"/>
+            <q-input ref="inputRef" filled v-model="address" label="Dirección" :class="{'error': addressError}" :dense="dense" style="border-radius: 5px; background-color: rgba(0, 122, 124);"/>
             <span v-if="addressError" class="error-message">Llena el campo correctamente</span>
           </div>
           <div style="flex: 1; min-width: 200px;">
-            <q-input ref="inputRef" filled v-model="phone" label="Teléfono" maxlength="11" :class="{'error': phoneError}" :dense="dense" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);"/>
-            <span v-if="phoneError" class="error-message">Llena el campo correctamente, </span>
+            <q-input ref="inputRef" filled v-model="phone" label="Teléfono" maxlength="11" :class="{'error': phoneError}" :dense="dense" style="border-radius: 5px; background-color: rgba(0, 122, 124);"/>
             <span v-if="phoneError" class="error-message">{{ phoneErrorMessage }}</span>
           </div>
         </div>
@@ -59,168 +55,210 @@
     </q-card-section>
   </form>
 
-    <q-card-section v-if="isAdult" style="margin: 3%; margin-top: -3%;">
-      <div class="text-h7">Representante</div>
+    <q-card-section v-if="isAdult" style="margin: 5%; margin-top: -8%;">
+      <div class="text-h6">Representante</div>
       <q-card-section style="text-align: left;">
         <div class="q-gutter-md" style="display: flex; flex-wrap: wrap;">
 
           <div style="flex: 1; min-width: 200px; margin-right: 10px;">
             <q-input ref="inputRef" filled v-model="representativeName" label="Nombre y Apellido" :dense="dense"
-              style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);"/>
+              style="border-radius: 5px; background-color: rgba(0, 122, 124);"/>
           </div>
 
           <div style="flex: 1; min-width: 200px;">
             <q-input ref="inputRef" filled v-model="relationship" label="Parentesco" :dense="dense"
-              style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);"/>
+              style="border-radius: 5px; background-color: rgba(0, 122, 124);"/>
           </div>
-
         </div>
       </q-card-section>
     </q-card-section>
 
-  <q-card-section style="margin: 3%; margin-top: -3%;">
-    <div class="text-h7">Motivo de consulta</div>
+    <q-card-section style="margin: 5%; margin-top: -8%;">
+      <div class="text-h6">Motivo de consulta</div>
       <q-card-section style="text-align: left;">
-
         <div class="q-gutter-md" style="display: flex; flex-wrap: wrap; margin-top: 0%;">
-          <q-input
-          filled
-          type="textarea"
-          v-model="subjetivo"
-          label="Subjetivo"
-          rows="10"
-          counter
-          maxlength="5000"
-          color="teal-9"
-          style="flex: 1; background-color: rgba(0, 122, 124, 1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 10px; font-size: 15px;"
-          input-style="color: white; line-height: 2; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 50%, transparent 200%); background-size: auto 10px; background-repeat: repeat-y;"
-        >
+        <q-input filled type="textarea" v-model="subjetivo" label="Subjetivo" rows="5" counter maxlength="5000" color="teal-9" style="flex: 1; background-color: rgba(0, 122, 124, 1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 10px; font-size: 15px;"
+        input-style="color: white; line-height: 2; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 50%, transparent 200%); background-size: auto 10px; background-repeat: repeat-y;">
         </q-input>
         </div>
-
-        <div class="text-h6">Objetivo</div>
-        <div class="q-gutter-md" style="display: flex; margin-top: 1%; flex-wrap: wrap;">
-
-          <div style="flex: 1; min-width: 150px; margin-right: 10px;">
-            <q-input rounded filled v-model="ta" label="T.A" :dense="dense"
-              color="teal-9" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);">
-            </q-input>
-          </div>
-
-          <div style="flex: 1; min-width: 150px; margin-right: 10px;">
-            <q-input rounded filled v-model="fc" label="Fc" :dense="dense"
-              color="teal-9" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);">
-            </q-input>
-          </div>
-
-          <div style="flex: 1; min-width: 150px; margin-right: 10px;">
-            <q-input rounded filled v-model="fr" label="Fr" :dense="dense"
-              color="teal-9" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);">
-            </q-input>
-          </div>
-
-          <div style="flex: 1; min-width: 150px; margin-right: 10px;">
-            <q-input rounded filled v-model="t" label="T°" :dense="dense"
-              color="teal-9" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);">
-            </q-input>
-          </div>
-
-          <div style="flex: 1; min-width: 150px;">
-            <q-input rounded filled v-model="salt" label="SaltO2" :dense="dense"
-              color="teal-9" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);">
-            </q-input>
-          </div>
-
-        </div>
-
-        <div style="margin-top: 5%;">
-
-          <q-input
-          filled
-          type="textarea"
-          v-model="otros"
-          label="Otros"
-          rows="10"
-          counter
-          maxlength="5000"
-          color="teal-9"
-          style="flex: 1; background-color: rgba(0, 122, 124, 1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 10px; font-size: 15px;"
-          input-style="color: white; line-height: 2; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 50%, transparent 200%); background-size: auto 10px; background-repeat: repeat-y;"
-        />
-        </div>
-  </q-card-section>
-  </q-card-section>
-
-    <q-card-section style="margin: 3%; margin-top: -3%;">
-  <div class="text-h7">Análisis</div>
-    <q-card-section style="text-align: left;">
-     <div class="q-gutter-md" style="display: flex; flex-wrap: wrap;">
-      <q-input
-      filled
-      type="textarea"
-      v-model="analisis"
-      label="Diagnóstico"
-      rows="10"
-      counter
-      maxlength="5000"
-      color="teal-9"
-      style="flex: 1; background-color: rgba(0, 122, 124, 1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 10px; font-size: 15px;"
-      input-style="color: white; line-height: 2; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 50%, transparent 200%); background-size: auto 10px; background-repeat: repeat-y;"
-    />
-      </div>
-  </q-card-section>
+      </q-card-section>
     </q-card-section>
-
-    <q-card-section style="margin: 3%; margin-top: -3%;">
-    <div class="text-h7">Plan terapéutico</div>
-      <q-card-section style="text-align: left;">
-        <div class="q-gutter-md" style="display: flex; flex-wrap: wrap;">
-          <q-input
-          filled
-          type="textarea"
-          v-model="planterapeutico"
-          label="Plan terapéutico"
-          rows="10"
-          counter
-          maxlength="5000"
-          color="teal-9"
-          style="flex: 1; background-color: rgba(0, 122, 124, 1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 10px; font-size: 15px;"
-          input-style="color: white; line-height: 2; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 50%, transparent 200%); background-size: auto 10px; background-repeat: repeat-y;"
-        />
-    </div>
-         </q-card-section>
-    </q-card-section>
-
-    <q-card-section style="display: flex; flex-direction: column; align-items: center;">
-      <div style="display: flex; justify-content: center; align-items: center;">
-        <q-input v-model="medico" label="Medico" :dense="dense" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7); "/>
-
-         <q-file color="teal-9" filled v-model="model" label="Firma" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7); ">
-         <template v-slot:prepend>
-           <q-icon name="cloud_upload" />
-         </template>
-         </q-file>
-        <q-input v-model="fechaRegistro" mask="##/##/####" label="Fecha" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7); "/>
-        </div>
-    </q-card-section>
-
-    <q-card-section style="display: flex; flex-direction: column; ">
-         <div class="q-pa-md q-gutter-md">
-         <q-btn @click="save" color="teal" label="Registrar" style="padding: 3%; width: 50%; align-items: center; margin-left: 25%;"/>
-        </div>
-    </q-card-section>
-
-  </q-card>
 </div>
 
+    <div v-if="currentStep === 2">
+      <q-card-section style="margin: 6%; margin-top: -3%;">
+        <div class="text-h6">Objetivo</div>
+            <div class="q-gutter-md" style="display: flex; margin-top: 1%; flex-wrap: wrap;">
+
+              <div style="flex: 1; min-width: 150px; margin-right: 10px;">
+                <q-input rounded filled v-model="ta" label="T.A" :dense="dense"
+                  color="teal-9" style="border-radius: 5px; background-color: rgba(0, 122, 124);">
+                </q-input>
+              </div>
+
+              <div style="flex: 1; min-width: 150px; margin-right: 10px;">
+                <q-input rounded filled v-model="fc" label="Fc" :dense="dense"
+                  color="teal-9" style="border-radius: 5px; background-color: rgba(0, 122, 124);">
+                </q-input>
+              </div>
+
+              <div style="flex: 1; min-width: 150px; margin-right: 10px;">
+                <q-input rounded filled v-model="fr" label="Fr" :dense="dense"
+                  color="teal-9" style="border-radius: 5px; background-color: rgba(0, 122, 124);">
+                </q-input>
+              </div>
+
+              <div style="flex: 1; min-width: 150px; margin-right: 10px;">
+                <q-input rounded filled v-model="t" label="T°" :dense="dense"
+                  color="teal-9" style="border-radius: 5px; background-color: rgba(0, 122, 124);">
+                </q-input>
+              </div>
+
+              <div style="flex: 1; min-width: 150px;">
+                <q-input rounded filled v-model="salt" label="SaltO2" :dense="dense"
+                  color="teal-9" style="border-radius: 5px; background-color: rgba(0, 122, 124);">
+                </q-input>
+              </div>
+            </div>
+
+                <div style="margin-top: 5%;">
+                  <q-input filled type="textarea" v-model="otros" label="Otros" rows="5" counter maxlength="5000" color="teal-9" style="flex: 1; background-color: rgba(0, 122, 124, 1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 10px; font-size: 15px;"
+                  input-style="color: white; line-height: 2; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 50%, transparent 200%); background-size: auto 10px; background-repeat: repeat-y;"/>
+                </div>
+
+                <div class="q-gutter-md" style="display: flex; flex-wrap: wrap; margin-top: 3%;">
+                  <q-input filled type="textarea" v-model="analisis" label="Diagnóstico" rows="5" counter maxlength="5000" color="teal-9"
+                  style="flex: 1; background-color: rgba(0, 122, 124, 1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 10px; font-size: 15px;"
+                  input-style="color: white; line-height: 2; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 50%, transparent 200%); background-size: auto 10px; background-repeat: repeat-y;"/>
+                </div>
+
+      </q-card-section>
+    </div>
+
+    <div v-if="currentStep === 3">
+      <q-card-section style="margin: 5%; margin-top: -3%;">
+        <div class="text-h6">Plan terapéutico</div>
+          <q-card-section style="text-align: left;">
+            <div class="q-gutter-md" style="display: flex; flex-wrap: wrap;">
+            <q-input filled type="textarea" v-model="planterapeutico" label="Plan terapéutico" rows="5" counter maxlength="5000"
+              color="teal-9" style="flex: 1; background-color: rgba(0, 122, 124, 1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 10px; font-size: 15px;"
+              input-style="color: white; line-height: 2; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 50%, transparent 200%); background-size: auto 10px; background-repeat: repeat-y;"/>
+            </div>
+          </q-card-section>
+      </q-card-section>
+
+      <q-card-section style="margin: 10%; margin-top: -3%;">
+        <q-card-section style="display: flex; align-items: flex-start; gap: 3%;">
+            <div style="display: flex; flex-direction: column; gap: 3%;">
+                <q-input
+                    v-model="medico"
+                    label="Medico"
+                    :dense="dense"
+                    readonly
+                    style="border-radius: 5px; background-color: rgba(0, 122, 124, 0.7);"
+                />
+                <q-input
+                    v-model="fechaRegistro"
+                    mask="##/##/####"
+                    label="Fecha Registro"
+                    readonly
+                    style="border-radius: 5px; background-color: rgba(0, 122, 124, 0.7); margin-top: 10%;"
+                />
+            </div>
+            <div style="margin-left: 200px;">
+                <q-uploader
+                    url="http://localhost:4444/upload"
+                    color="teal"
+                    flat
+                    bordered
+                    style="max-width: 300px; "
+                />
+            </div>
+        </q-card-section>
+
+        <div v-if="firmaUrl">
+            <img :src="firmaUrl" alt="Firma Digital" style="max-width: 100%; border-radius: 10px;" />
+        </div>
+    </q-card-section>
+
+  </div>
+
+  <q-card-section style="display:flex; justify-content:center; margin-top: -5%; margin-bottom: 1%;">
+    <q-btn
+      v-if='currentStep > 1'
+      @click='prevStep'
+      round
+      color='transparent'
+      icon="arrow_back"
+      class="ripple-effect large-btn"
+      style="margin-right: 50%;"
+    />
+    <q-btn
+      v-if='currentStep < totalSteps'
+      @click='nextStep'
+      round
+      color='transparent'
+      icon="arrow_forward"
+      class="ripple-effect large-btn"
+    />
+    <q-btn
+      v-if='currentStep === totalSteps'
+      @click="save"
+      color="teal-9"
+      label="Registrar"
+    />
+
+  </q-card-section>
+
+<q-dialog v-model="persistent" persistent transition-show="scale" transition-hide="scale">
+  <q-card :class="{'border-red': !isValid, 'border-green': isValid}" style="width: 300px; margin-left: 14%;">
+    <q-card-section>
+      <div class="text-h6">¿Deseas Guardar esta historia médica?</div>
+      <div class="text-h9">{{ message }}</div>
+    </q-card-section>
+    <q-card-actions align="right" class="q-pa-md">
+      <q-btn @click="saveuno(selectedRow)" label="Guardar" color="primary"/>
+      <q-btn @click="back" label="Cancelar" color="red"/>
+    </q-card-actions>
+  </q-card>
+</q-dialog>
+
+</q-card>
+</q-card>
+</div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { doc, setDoc, getDoc } from 'firebase/firestore'
-import { firestore } from 'boot/firebase'
+import { firestore, db } from 'boot/firebase'
+import { getAuth } from 'firebase/auth'
+import useNotificaciones from 'boot/useNotificaciones'
 
-// Reactive state variables
+const { agregarNotificacion } = useNotificaciones()
+
+onMounted(async () => {
+  setFechaActual()
+  const auth = getAuth()
+  const user = auth.currentUser
+
+  if (user) {
+    const userId = user.email
+    const docRef = doc(db, 'usersColecction', userId)
+    const docSnap = await getDoc(docRef)
+
+    if (docSnap.exists()) {
+      medico.value = docSnap.data().username
+    } else {
+      console.log('El documento no existe')
+    }
+  } else {
+    console.log('No hay usuario autenticado')
+  }
+})
+
+const currentStep = ref(1)
+const totalSteps = ref(3)
 const name = ref('')
 const surname = ref('')
 const age = ref(null)
@@ -243,8 +281,6 @@ const medico = ref('')
 const fechaRegistro = ref('')
 const dense = ref(false)
 const isAdult = computed(() => age.value <= 18)
-const formErrorMessage = ref('') // Initialize form error message
-
 const nameError = ref(false)
 const surnameError = ref(false)
 const ageError = ref(false)
@@ -253,41 +289,68 @@ const idCardError = ref(false)
 const addressError = ref(false)
 const phoneError = ref(false)
 const phoneErrorMessage = ref('')
+const showDatePicker = ref(false)
+
+const firmaUrl = ref('')
+
+const persistent = ref(false)
+const selectedRow = ref(null)
+const back = () => {
+  persistent.value = false
+}
+const save = (rowData) => {
+  persistent.value = true
+  selectedRow.value = rowData
+}
+
+const formattedDate = computed(() => {
+  if (!birthDate.value) return ''
+  const dateParts = birthDate.value.split('-')
+  return `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`
+})
+
+function onDateSelected (date) {
+  birthDate.value = date
+  showDatePicker.value = false
+}
+
+const validateBirthDate = () => {
+  return !!birthDate.value
+}
 
 const checkForm = () => {
-  // Reset error flags
   nameError.value = !name.value
   surnameError.value = !surname.value
   ageError.value = age.value === null || age.value < 1 || age.value > 110
-
-  // Validate birthDate
-  birthDateError.value = !birthDateError.value
-
+  birthDateError.value = !validateBirthDate()
   idCardError.value = !idCard.value
   addressError.value = !address.value
 
-  // Phone number validation
   const validPrefixes = ['0412', '0414', '0424', '0416', '0254']
+
   if (!phone.value || !validPrefixes.some(prefix => phone.value.startsWith(prefix))) {
-    phoneError.value = true // Set error flag
-    phoneErrorMessage.value = 'Número inválido' // Set error message
+    phoneError.value = true
+    phoneErrorMessage.value = 'Número inválido'
   } else {
-    phoneError.value = false // Clear error flag
-    phoneErrorMessage.value = '' // Clear error message
+    phoneError.value = false
+    phoneErrorMessage.value = ''
   }
 
-  // If there are errors, do not continue with submission
-  if (nameError.value || surnameError.value || ageError.value || birthDateError.value || idCardError.value || addressError.value || phoneError.value) {
-    return
-  }
+  const isValid =
+    !nameError.value &&
+    !surnameError.value &&
+    !ageError.value &&
+    !birthDateError.value &&
+    !idCardError.value &&
+    !addressError.value &&
+    !phoneError.value
 
-  guardar()
+  return isValid
 }
 
-const guardar = async () => { // Declarar la función como async
+const guardar = async () => {
   const idCardRef = doc(firestore, 'DatosPersonales', idCard.value)
 
-  // Usar await para obtener el documento
   const idCardDoc = await getDoc(idCardRef)
 
   if (idCardDoc.exists()) {
@@ -296,7 +359,6 @@ const guardar = async () => { // Declarar la función como async
   }
 
   try {
-    // Guardar en DatosPersonales
     await setDoc(idCardRef, {
       name: name.value,
       surname: surname.value,
@@ -306,7 +368,8 @@ const guardar = async () => { // Declarar la función como async
       address: address.value,
       phone: phone.value,
       medico: medico.value,
-      fechaRegistro: fechaRegistro.value
+      fechaRegistro: new Date().toISOString(),
+      usuarioregistro: medico.value
     })
 
     // Guardar en MotivosConsulta
@@ -321,7 +384,8 @@ const guardar = async () => { // Declarar la función como async
       salt: salt.value,
       otros: otros.value,
       analisis: analisis.value,
-      planterapeutico: planterapeutico.value
+      planterapeutico: planterapeutico.value,
+      usuarioregistro: medico.value
     })
 
     // Guardar en Representante
@@ -329,50 +393,155 @@ const guardar = async () => { // Declarar la función como async
     await setDoc(repre, {
       idCard: idCard.value,
       representativeName: representativeName.value,
-      relationship: relationship.value
+      relationship: relationship.value,
+      usuarioregistro: medico.value
     })
 
     console.log('Datos guardados correctamente')
+
+    agregarNotificacion(`${medico.value} creó una historia médica del paciente ${name.value} ${surname.value} el `)
+
+    name.value = ''
+    surname.value = ''
+    age.value = ''
+    birthDate.value = ''
+    idCard.value = ''
+    address.value = ''
+    phone.value = ''
+    idCard.value = ''
+    subjetivo.value = ''
+    ta.value = ''
+    fc.value = ''
+    fr.value = ''
+    t.value = ''
+    salt.value = ''
+    otros.value = ''
+    analisis.value = ''
+    planterapeutico.value = ''
+    representativeName.value = ''
+    relationship.value = ''
+    persistent.value = false
   } catch (error) {
     console.error('Error al guardar los datos:', error)
   }
 }
 
-async function save () {
-  const isValid = checkForm()
-  if (!isValid) {
+const message = ref('')
+
+const isValid = ref(true)
+
+const saveuno = async () => {
+  isValid.value = checkForm()
+  if (!isValid.value) {
+    message.value = 'Los campos no están correctamente llenados'
     return
   }
+
   try {
+    message.value = 'Registro exitoso'
+    isValid.value = true
     await guardar()
-    alert('Los datos se han guardado correctamente.')
   } catch (error) {
-    console.error('Error al intentar guardar los datos:', error)
-    formErrorMessage.value = 'Ocurrió un error al guardar los datos. Por favor, inténtelo de nuevo más tarde.'
+    message.value = 'Error al guardar el registro'
+    isValid.value = false
+  } finally {
+    persistent.value = false
   }
+}
+
+function nextStep () {
+  if (currentStep.value < totalSteps.value) {
+    currentStep.value++
+  }
+}
+
+function prevStep () {
+  if (currentStep.value > 1) {
+    currentStep.value--
+  }
+}
+
+const setFechaActual = () => {
+  const hoy = new Date()
+  const dia = String(hoy.getDate()).padStart(2, '0')
+  const mes = String(hoy.getMonth() + 1).padStart(2, '0')
+  const año = hoy.getFullYear()
+
+  fechaRegistro.value = `${dia}/${mes}/${año}`
 }
 
 </script>
 
 <style scoped>
-.error {
+
+.large-btn {
+  width: 80px; /* Adjust width as needed */
+  height: 80px; /* Adjust height as needed */
+  font-size: 30px; /* Adjust icon size if necessary */
+}
+
+.ripple-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5); /* Adjust color and opacity */
+  transform: scale(0);
+  animation: ripple-animation 0.6s linear;
+}
+
+@keyframes ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.border-red {
   border: 2px solid red;
 }
+.border-green {
+  border: 2px solid green;
+}
+
+.close-button {
+  color: #c25252;
+  float: right;
+  font-size: 28px;
+}
+.error {
+  border: 2px solid red; /* Estilo para el borde de error */
+}
+
 .error-message {
-  color: red;
-  font-size: 12px;
-  margin-top: -5px;
+  color: red; /* Color del mensaje de error */
+  font-size: 12px; /* Tamaño de fuente del mensaje de error */
+  margin-top: -5px; /* Espaciado negativo para ajustar la posición */
 }
 
 .custom-tab-panel {
- padding: 0;
+  padding: 0; /* Sin padding para el panel de pestañas personalizado */
 }
+
 .my-card {
-  background-color: #242424; /* Color gris sólido */
+  background-color: transparent; /* Fondo completamente transparente para la tarjeta */
 }
+
 .q-input__label {
   color: black !important; /* Cambia el color del label a negro */
   font-weight: bold; /* Hace que el texto del label sea negrita */
   /* Ajusta el tamaño de la fuente según sea necesario */
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
 }
 </style>

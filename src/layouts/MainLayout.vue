@@ -1,163 +1,261 @@
 <template>
-  <q-layout view="lHh Lpr lFf" class="background-image">
+    <q-layout view="hHh Lpr lff" container style="height: 300px" class="shadow-2 rounded-border background-image">
+      <q-header elevated :class="$q.dark.isActive ? 'bg-secondary' : 'bg-black'">
+        <q-toolbar>
+          <q-btn flat @click="drawer = !drawer" round dense icon="menu"/>
+          <q-toolbar-title class="text-teal-9 text-bold">Hospital Adventista de Venezuela</q-toolbar-title>
 
-    <div>
-      <p v-if="filteredLinksList.length === 0">No tienes acceso a ninguna opción.</p>
-    </div>
-    <q-header elevated class="custom-header">
-      <q-toolbar class="emerald-toolbar">
-        <q-toolbar-title class="text-center text-bold">
-          <div class="text-black-8 text-bold">Hospital Adventista de Venezuela</div>
-        </q-toolbar-title>
+        <q-btn v-if="isAdmin" round dense flat color="grey-8" icon="notifications" @click="showNotifications">
+          <q-badge v-if="notificationCount > 0" color="red" text-color="white" floating>
+            {{ notificationCount }}
+          </q-badge>
+          <q-tooltip>Notificaciones</q-tooltip>
+        </q-btn>
 
-        <div>
-          <q-toolbar-title class="text-right text-bold">
-            <div class="text-black-8 text-bold">user</div>
-          </q-toolbar-title>
-        </div>
-      </q-toolbar>
-    </q-header>
+          <div class="text-teal-9 text-bold">{{ userName }}</div>
+        </q-toolbar>
 
-    <q-drawer v-model="leftDrawerOpen" style="background-color: white;">
-      <q-list>
-        <q-item-label header>
-          <img alt="logo" src="src/assets/images-removebg-preview.png" style="width: 50%; margin-left: 20%;" />
-        </q-item-label>
+      </q-header>
 
-        <EssentialLink
-          class="btnList bg-green-8 text-black"
-          style="margin: 5%; width: 270px; height: 100px; border-radius: 15px; box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.9);"
-          v-for="link in filteredLinksList"
-          :key="link.title"
-          v-bind="link"
-        />
+  <q-drawer
+  v-model="drawer"
+  show-if-above
 
-      </q-list>
-    </q-drawer>
-    <q-page-container>
-      <router-view />
-    </q-page-container>
+  :mini="miniState"
+  @mouseenter="miniState = false"
+  @mouseleave="miniState = true"
+
+  :width="250"
+  :breakpoint="500"
+  bordered
+  :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-3'"
+>
+
+<q-scroll-area class="fit" :horizontal-thumb-style="{ opacity: 0 }">
+  <q-item-label header>
+    <img alt="logo" src="src/assets/images-removebg-preview.png" style="width: 50%; margin-left: 20%;" />
+  </q-item-label>
+
+  <q-list padding>
+    <q-item
+      v-for="(item, index) in filteredMenuItems"
+      :key="index"
+      :to="item.link"
+      @click="() => navigateTo(item.link)"
+      clickable
+      v-ripple
+    >
+      <q-item-section avatar>
+        <q-icon :name="item.icon" />
+      </q-item-section>
+
+      <q-item-section>
+        {{ item.title }}
+      </q-item-section>
+    </q-item>
+
+    <q-separator />
+
+    <q-item clickable v-ripple @click="logout">
+      <q-item-section avatar>
+        <q-icon name="logout" />
+      </q-item-section>
+
+      <q-item-section>
+        Salir
+      </q-item-section>
+    </q-item>
+  </q-list>
+</q-scroll-area>
+</q-drawer>
+
+<q-page-container>
+  <router-view />
+  <q-inner-loading
+    :showing="loading"
+    label="Please wait..."
+    label-class="text-teal"
+    label-style="font-size: 1.1em"
+  />
+</q-page-container>
   </q-layout>
+
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
-import { getAuth } from 'firebase/auth'
+import { ref, computed, onMounted, watch } from 'vue'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { doc, getDoc } from 'firebase/firestore'
-import { firestore } from 'boot/firebase'
+import { firestore, auth } from 'boot/firebase'
+import { useRouter, useRoute } from 'vue-router'
+
+import useNotificaciones from 'boot/useNotificaciones'
+
+const { contarNotificacionesNoVistas, obtenerNotificaciones } = useNotificaciones()
+
+const notificationCount = computed(() => contarNotificacionesNoVistas())
+
+const showNotifications = () => {
+  router.push('/notis')
+  const notifications = obtenerNotificaciones()
+  notifications.forEach(notif => {
+    notif.visto = true
+  })
+}
+const router = useRouter()
+
+const loading = ref(false)
+const route = useRoute()
+
+const startLoading = () => {
+  loading.value = true
+  setTimeout(() => {
+    loading.value = false
+  }, 5000)
+}
+
+watch(route, (to) => {
+  if (to.path === '/registros') {
+    startLoading()
+  } else {
+    loading.value = false
+  }
+})
+
+const userName = ref('')
+const drawer = ref(false)
+const miniState = ref(true)
+const visible = ref(false)
+
+onMounted(async () => {
+  const auth = getAuth()
+
+  if (route.path === '/registros') {
+    startLoading()
+  }
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      userName.value = user.email
+      await fetchUserRole(user.email)
+    } else {
+      userName.value = ''
+      console.log('No hay usuario autenticado')
+    }
+  })
+})
+
+const isAdmin = computed(() => userRole.value === 'admin')
+
+const navigateTo = (link) => {
+  visible.value = true
+
+  router.push(link).then(() => {
+    setTimeout(() => {
+      visible.value = false
+    }, 5000)
+  })
+}
 
 defineOptions({
   name: 'MainLayout'
 })
 
-// Reactive properties
-const userRole = ref('') // This will hold the user's role after login
-const leftDrawerOpen = ref(true)
+const userRole = ref('')
 
-// Links list with roles defined
-const linksList = [
+const menuItems = ref([
   {
     title: 'Usuarios',
-    caption: 'Consultar Paciente',
-    icon: 'how_to_reg',
-    link: '/usuarios', // Ensure this link is defined
-    role: ['admin'] // Only visible to admin
+    icon: 'group',
+    link: '/usuarios',
+    role: ['admin']
   },
   {
     title: 'Nueva Historia Medica',
-    caption: 'Crear',
     icon: 'library_add',
-    link: '/newhistory', // Visible to all users (admin and common)
+    link: '/newhistory',
     role: ['admin', 'user']
   },
   {
     title: 'Registros',
-    caption: 'Consultar Paciente',
     icon: 'how_to_reg',
-    link: '/registros', // Visible to all users (admin and common)
+    link: '/registros',
     role: ['admin', 'user']
   },
   {
-    title: 'Archivos Muertos',
-    caption: 'Crear',
-    icon: 'library_add',
+    title: 'Archivados',
+    icon: 'folder_delete',
     link: '/archivosmuertos',
-    role: ['admin'] // Only visible to admin
+    role: ['admin']
   },
   {
     title: 'Configuracion',
-    caption: 'Crear',
-    icon: 'library_add',
+    icon: 'settings',
     link: '/configuracion',
-    role: ['admin, user'] // Only visible to admin
+    role: ['admin', 'user']
   }
-]
+])
 
-// Function to fetch user role from Firestore
 const fetchUserRole = async (email) => {
   const userDocRef = doc(firestore, 'usersColecction', email)
   const userSnapshot = await getDoc(userDocRef)
 
   if (userSnapshot.exists()) {
     const userData = userSnapshot.data()
-    userRole.value = userData.role // Store user role
+    userRole.value = userData.role
   } else {
     console.log('El usuario no existe en la base de datos')
   }
 }
 
-// Fetch user role when component mounts
-onMounted(async () => {
-  const auth = getAuth()
-  const user = auth.currentUser
+const filteredMenuItems = computed(() => {
+  return menuItems.value.filter(item =>
+    item.role.some(role => userRole.value.includes(role))
+  )
+})
 
-  if (user) {
-    await fetchUserRole(user.email) // Fetch role for logged-in user
+const logout = async () => {
+  const confirmation = confirm('¿Deseas cerrar sesión?')
+
+  if (confirmation) {
+    try {
+      await auth.signOut()
+      console.log('Usuario ha cerrado sesión exitosamente.')
+
+      router.push('/')
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error)
+    }
   } else {
-    console.log('No hay usuario autenticado')
+    console.log('Cierre de sesión cancelado.')
   }
-})
-
-// Computed property to filter links based on user role
-const filteredLinksList = computed(() => {
-  if (userRole.value === 'admin') {
-    return linksList // Admin sees all links
-  } else if (userRole.value === 'user') {
-    return linksList.filter(link => link.role.includes('user')) // Common user sees specific links
-  }
-
-  return [] // If no role is set, return an empty array
-})
+}
 </script>
 
 <style scoped>
 .emerald-toolbar {
-  background-color: #369b64; /* Color verde esmeralda pastel */
-  color: rgb(0, 0, 0); /* Cambia el color del texto si es necesario */
+  background-color: #2cb0c7;
+  color: rgb(0, 0, 0);
   border-radius: 1000;
 }
 
 .q-layout {
-  height: 100vh; /* Asegura que el layout ocupe toda la altura de la ventana */
+  height: 100vh;
   overflow: hidden;
   opacity: 10;
 }
 
 .background-image {
   background-image: url('src/assets/Hospital-Adventista.jpg');
-  background-size: cover; /* Asegura que la imagen cubra toda el área */
-  background-position: center; /* Centra la imagen */
-  background-repeat: no-repeat; /* Evita que la imagen se repita */
-  min-height: 100vh; /* Asegura que cubra al menos toda la altura del viewport */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
   width: 100%;
 }
 
 .custom-header {
   padding: 10px;
-  background-color: #369b64;
-  border-bottom-left-radius: 15%; /* Redondear esquina inferior izquierda */
-  border-bottom-right-radius: 15%; /* Redondear esquina inferior derecha */
+  background-color: #2cb0c7;
 }
 
 </style>

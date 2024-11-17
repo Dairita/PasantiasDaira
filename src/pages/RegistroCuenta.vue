@@ -22,9 +22,9 @@ import CuentaComponent from 'src/components/CuentaComponent.vue'
   top: 50%;
   left: 46%;
   transform: translate(-50%, -50%);
-  width: 1000px; /* Ajusta el ancho según sea necesario */
-  height: 750px; /* Ajusta la altura según sea necesario */
-  background-color: #15c8ff;
+  width: 500px;
+  height: 650px;
+  background-color: #232627;
   border-radius: 5%;
 }
 </style>

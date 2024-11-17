@@ -8,6 +8,18 @@ const routes = [
     component: () => import('pages/RegistroCuenta.vue')
   },
   {
+    path: '/correo',
+    component: () => import('pages/correoPage.vue')
+  },
+  {
+    path: '/recuperarclave',
+    component: () => import('pages/RecuperacionPage.vue')
+  },
+  {
+    path: '/reportes',
+    component: () => import('pages/ReportesPage.vue')
+  },
+  {
     path: '/main',
     component: () => import('layouts/MainLayout.vue'),
     children: [
@@ -17,11 +29,11 @@ const routes = [
       { path: '/usuarios', component: () => import('pages/UsuariosPage.vue'), meta: { requiresAuth: true } },
       { path: '/registros', component: () => import('pages/RegistrosPage.vue'), meta: { requiresAuth: true } },
       { path: '/archivosmuertos', component: () => import('pages/ArchivosMuertosPage.vue'), meta: { requiresAuth: true } },
-      { path: '/configuracion', component: () => import('pages/ConfiguracionPage.vue'), meta: { requiresAuth: true } }
+      { path: '/configuracion', component: () => import('pages/ConfiguracionPage.vue'), meta: { requiresAuth: true } },
+      { path: '/notis', component: () => import('pages/notifyPage.vue'), meta: { requiresAuth: true } }
     ]
   },
-  // Siempre deja esto como el último,
-  // pero también puedes eliminarlo
+
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/ErrorNotFound.vue')

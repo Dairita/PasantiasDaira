@@ -1,46 +1,40 @@
 <template>
-<div>
-  <q-inner-loading
-    style="display: flex; position: fixed;"
-    :showing="visible"
-    label="Please wait..."
-    label-class="text-teal"
-    label-style="font-size: 1.1em"
-  />
-  <div class="q-pa-md">
-    <form style=" padding: 50px; text-align: center; min-width: 100%; height: 100%; background-image: linear-gradient(#a9a9a977, #33333377); border-radius: 30px;">
+    <q-card class="login slide-in">
+      <img alt="Quasar logo" src="src/assets/images-removebg-preview.png" style="max-height: 150px; max-width: 150px; margin-top: -30%; margin-bottom: 20%; margin-left: 15%;"/>
+      <q-input v-model="email" type="email" filled label="Email" style="min-width: 120%; margin-left: 10px; margin-left: -8%; background-color: #1e1e2f; border-radius: 16px; color: white; margin-bottom: 10%;"/>
+      <q-input
+      v-model="passw"
+      filled
+      :type="showPassword ? 'text' : 'password'"
+      label="Contraseña"
+      style="min-width: 120%; margin-left: -8%; background-color: #1e1e2f; border-radius: 16px; color: white;"
+    >
+      <template v-slot:append>
+        <q-icon
+          :name="showPassword ? 'visibility' : 'visibility_off'"
+          @click="togglePasswordVisibility"
+          class="cursor-pointer"
+        />
+      </template>
+    </q-input>
+      <q-btn push type="submit" style="width: 80%; margin-top: 10%; margin-left: 10%; margin-bottom:20px ;" label="INGRESAR" color="green-8" @click="login()"/>
 
-      <div class="q-gutter-md">
-        <div>
-          <img alt="Quasar logo" src="src/assets/images-removebg-preview.png" style="max-width: 200px; max-height: 150px; margin-left: -8%; margin-top: -20%;"/>
-        </div>
-        <div style="margin-bottom: -20%;">
-        <div style="margin-top: -10%;">
-        <h5><em>Ingresa con tu cuenta</em></h5>
-      </div>
-        <div class="q-gutter-md" style="margin: 30px; padding: 0px">
-          <q-input v-model="email" type="email" filled label="Email" style="min-width: 120%; margin-left: -8%; background-color: #1e1e2f; border-radius: 16px; color: white;"  />
-          <q-input v-model="passw" filled :type="isPwd ? 'password' : 'text'" label="Contraseña" style="min-width: 120%; margin-left: -8%; background-color: #1e1e2f; border-radius: 16px; color: white;"/>
-          <h6>Olvidaste tu contraseña?</h6>
-        </div>
-      </div>
-        <div class="flex flex-center q-pa-md" style="justify-content: space-around; margin: 2%">
-        </div>
-        <q-btn push type="submit" style="width: 80%; margin-top: -5%;" label="INGRESAR" color="green-8" @click="login()"/>
+      <h8 class="texto-recuperacion" style="margin-left: 16%; margin-top: 20%;" @click="irArecuperacion">Olvidaste tu contraseña?</h8>
 
-        <div style="display: flex; margin-top: 20%;">
-          <h10>Crea tu cuenta propia</h10>
-          <q-btn push type="submit" style="width: 80%; margin-top: -5%;" label="RRGISTRATE" color="green-8" @click="irARegistro()"/>
-          <div v-if="errorMessage">{{ errorMessage }}</div>
-        </div>
+      <hr style="margin: 20px; border-top: 1px solid #ccc;"/>
 
-        <div class="flex flex-center q-gutter-md"/>
+      <q-btn push type="submit" style="width: 80%; margin-top: 5%; margin-left: 10%;" label="REGISTRATE" color="green-8" @click="irARegistro()"/>
 
-      </div>
-    </form>
-  </div>
-</div>
-</template>
+      <div v-if="errorMessage" style="margin-left: 16%; margin-top: 15px;">{{ errorMessage }}</div>
+
+      <q-inner-loading
+        :showing="visible && !errorMessage"
+        label="Please wait..."
+        label-class="text-teal"
+        label-style="font-size: 1.1em"
+      />
+    </q-card>
+  </template>
 
 <script setup>
 import { ref } from 'vue'
@@ -49,23 +43,33 @@ import { doc, getDoc } from 'firebase/firestore'
 import { firestore } from 'boot/firebase'
 import { useRouter } from 'vue-router'
 
-// Inicializar el router
 const router = useRouter()
+const visible = ref(false)
 
-// Variables reactivas
 const email = ref('')
 const passw = ref('')
 const emailError = ref(false)
 const passError = ref(false)
 const errorMessage = ref('')
 const userRole = ref('')
-const isPwd = false
+
+const showPassword = ref(false)
+
+// Función para alternar la visibilidad de la contraseña
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value
+}
 
 const irARegistro = () => {
   router.push('/registro')
 }
 
+const irArecuperacion = () => {
+  router.push('/correo')
+}
+
 const login = async () => {
+  visible.value = true
   emailError.value = false
   passError.value = false
   errorMessage.value = ''
@@ -85,30 +89,21 @@ const login = async () => {
   const auth = getAuth()
 
   try {
-    // Intentar iniciar sesión con Firebase Authentication
     const userCredential = await signInWithEmailAndPassword(auth, email.value, passw.value)
-
-    // Obtener el documento del usuario desde Firestore
     const userDocRef = doc(firestore, 'usersColecction', userCredential.user.email)
     const userSnapshot = await getDoc(userDocRef)
 
     if (userSnapshot.exists()) {
       const userData = userSnapshot.data()
-      userRole.value = userData.role // Almacenar el rol del usuario
-
-      // Verificar si el usuario está confirmado
+      userRole.value = userData.role
       if (!userData.confirmed) {
         errorMessage.value = 'Tu cuenta no está confirmada. No puedes acceder.'
         return
       }
-
-      // Asegurarse de que la cuenta del administrador esté confirmada por defecto
       if (userData.email === 'clinica@gmail.com' && !userData.confirmed) {
         errorMessage.value = 'La cuenta del administrador debe estar confirmada por defecto.'
         return
       }
-
-      // Log message based on user role
       if (userData.role === 'admin') {
         console.log('Entraste como usuario administrador')
       } else if (userData.role === 'user') {
@@ -116,10 +111,12 @@ const login = async () => {
       }
 
       router.push('/menu')
+      visible.value = false
     } else {
       console.log('El usuario no existe en la base de datos')
     }
   } catch (error) {
+    visible.value = false
     console.error('Error durante la autenticación:', error)
     switch (error.code) {
       case 'auth/user-not-found':
@@ -137,8 +134,42 @@ const login = async () => {
 </script>
 
 <style scoped>
-/* Estilos opcionales */
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.8s ease forwards;
+}
+
 .text-red-500 {
   color: red;
 }
+
+.login{
+  width: 100%;
+  padding: 80px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(30, 182, 187, 0.418);
+  margin-left: 0%;
+}
+.texto-recuperacion {
+  color: white;
+  text-decoration: underline;
+  font-style: italic;
+  transition: color 0.3s;
+}
+
+.texto-recuperacion:hover {
+  color: blue;
+}
+
 </style>

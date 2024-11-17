@@ -2,10 +2,10 @@
   <div style="position: relative;">
     <q-img
       src="src/assets/Hospital-Adventista.jpg"
-      style="max-width: 2000px; max-height: 958px;">
+      style="max-width: 2000px; max-height: 100vh;">
     </q-img>
 
-    <div class="centered-rectangle" style="opacity: 4.0; margin-left: 4%;">
+    <div class="centered-rectangle slide-in slideInDown">
       <LoginComponent />
     </div>
 
@@ -26,14 +26,28 @@ export default defineComponent({
 
 <style>
 
+@keyframes slideIn {
+  from {
+    transform: translateY(-50%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.slide-in {
+  animation: slideIn 0.9s ease forwards;
+}
+
 .centered-rectangle {
   position: absolute;
-  top: 48%;
-  left: 48%;
+  top: 15%;
+  left: 40%;
   transform: translate(-50%, -50%);
-  background-color: #15c8ff;
-  opacity: 0.5;
+  background-color: rgba(0, 0, 0, 0.5); /* Cambia a un color negro con 50% de opacidad */
   padding: 1px 2px;
-  border-radius: 30px;
+  border-radius: 10px;
 }
 </style>

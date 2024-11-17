@@ -1,33 +1,40 @@
 <template>
   <div class="q-pa-md" style="height: 100vh; display: flex; flex-direction: column; align-items: center; margin-top: 5%;">
-    <div style="display: flex; align-items: center;"></div>
+    <div v-if="showActualizacion">
+    </div>
+    <div style="display: flex; align-items: center;"/>
 
     <q-table
+      v-model:pagination="pagination"
       :rows="filteredRecords"
       :columns="columns"
       row-key="id"
+      :rows-per-page-options="[12]"
       class="q-mt-md custom-table"
-      style="background-color: white; border: 20px solid #007A7C; width: 100%; height: 90%; margin-top: -5%"
-    >
+      style="background-color: rgba(230, 230, 250, 0.0);  border: 20px; width: 100%; height: 90%; margin-top: -5%; background-image: linear-gradient( #1989, #3333);">
+
       <template v-slot:top>
         <q-toolbar>
-          <q-toolbar-title>Registros Médicos</q-toolbar-title>
+          <q-toolbar-title  style="font-size: 1.2em; font-weight: bold;">Registros Médicos</q-toolbar-title>
           <div style="display: flex; align-items: center;">
-            <q-input standout v-model="text" label="Cédula" @input="search" />
-            <q-btn @click="search" color="secondary" label="Buscar" style="margin-left: 10px;" />
+            <q-input standout v-model="text" label=" Buscar Cédula" mask="##.###.###" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);"/>
+
+            <q-btn @click="exportToExcel" class="q-mb-md custom-btn" color="red" style="width: 60px; height: 60px; margin-left: 5%; display: flex; align-items: center; justify-content: center;">
+              <q-icon name="view_list" size="24px" class="zoom-icon" />
+              </q-btn>
           </div>
         </q-toolbar>
       </template>
 
       <template v-slot:body-cell-actions="props">
-        <q-td :props="props">
-          <q-btn @click="consultar(props.row)" label="Consultar" color="primary"/>
-          <q-btn @click="deleteRecord(props.row.idCard)" label="Eliminar" color="negative" style="margin-left: 10px;" />
+        <q-td :props="props" style="font-size: 1.1em;">
+          <q-btn @click="consultar(props.row)" color="cyan-9" icon="person_search"/>
+          <q-btn @click="deleteRecord(props.row.idCard)" icon="delete" v-if="isDeleteButtonVisible(props.row.fechaRegistro, props.row.fecha)" color="negative" style="margin-left: 10px;"/>
 
-    <q-dialog v-model="persistent" persistent transition-show="scale" transition-hide="scale">
-      <q-card class="black text-white" style="width: 3000px">
+    <q-dialog v-model="persistent" transition-show="scale" transition-hide="scale">
+      <q-card class="black patients.idCard-white" style="width: 3000px">
         <q-card-section>
-          <div class="text-h6">Acceso a historia medica</div>
+          <div class="patients.idCard-h6">Acceso a historia medica</div>
         </q-card-section>
 
         <q-card-section class="q-pa-md" style="margin-left: 20%;" >
@@ -40,44 +47,151 @@
           label="Contraseña"
           :dense="dense"
           style="width: 50%; margin-left: 10%; background-color: #1e1e2f; border-radius: 16px; color: white;"
-        />
-        </q-card-section>
+        >
+          <template v-slot:append>
+            <q-icon
+              :name="isPwd ? 'visibility_off' : 'visibility'"
+              @click="isPwd = !isPwd"
+              style="cursor: pointer;"
+            />
+          </template>
 
+        </q-input>
+        <div v-if="passError" class="error-message">La contraseña es incorrecta.</div>
+        </q-card-section>
         <q-card-actions align="right" class="q-pa-md">
-          <q-btn @click="acceder(selectedRow)" label="Consultar" color="primary"/>
+          <q-btn @click="acceder(selectedRow)" icon="search" color="teal-9"/>
         </q-card-actions>
+        <q-inner-loading
+          :showing="visible"
+          label="Please wait..."
+          label-class="text-teal"
+          label-style="font-size: 1.1em"
+        />
       </q-card>
     </q-dialog>
+
         </q-td>
 
       </template>
     </q-table>
   </div>
+
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { collection, getDocs, doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore'
-import { firestore } from 'boot/firebase'
+
+import { ref, onMounted, computed } from 'vue'
+import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, orderBy, limit, query } from 'firebase/firestore'
+import { firestore, auth } from 'boot/firebase'
 import { useRouter } from 'vue-router'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import useNotificaciones from 'boot/useNotificaciones'
+import dayjs from 'dayjs'
+import * as XLSX from 'xlsx'
+
+function exportToExcel () {
+  const worksheet = XLSX.utils.json_to_sheet(patients.value)
+  const workbook = XLSX.utils.book_new()
+
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Patients')
+
+  // Generate buffer and create a downloadable file
+  XLSX.writeFile(workbook, 'patients_data.xlsx')
+}
+
+const { agregarNotificacion } = useNotificaciones()
 
 const router = useRouter()
-const filteredRecords = ref([])
+const persistent = ref(false)
+const selectedRow = ref(null)
+const patients = ref([])
+const records = ref([])
+
+const pass = ref('')
+const passError = ref(false)
+const isPwd = ref(true)
+const visible = ref(false)
+
+onMounted(() => {
+  getRecords()
+  getPatientsWithLastConsultation()
+})
 
 const text = ref('')
-const persistent = ref(false)
-const selectedRow = ref(null) // New ref to hold selected row data
 
 const columns = [
   { name: 'name', label: 'Nombre', align: 'left', field: 'name' },
-  { birthDate: 'age', label: 'Edad', align: 'center', field: 'age' },
-  { idCard: 'idCard', label: 'Cédula', align: 'center', field: 'idCard' },
-  { medico: 'medico', label: 'Médico', align: 'left', field: 'medico' },
-  { fechaRegistro: 'fechaRegistro', label: 'Fecha Registro', align: 'left', field: 'fechaRegistro' },
+  { name: 'age', label: 'Edad', align: 'center', field: 'age' },
+  { name: 'idCard', label: 'Cédula', align: 'center', field: 'idCard' },
+  { name: 'medico', label: 'Médico', align: 'left', field: 'medico' },
+  { name: 'fechaRegistro', label: 'Fecha Registro', align: 'left', field: 'fechaRegistro' },
+  { name: 'fecha', label: 'Última Consulta', align: 'left', field: 'fecha' },
   { name: 'actions', label: 'Acciones', align: 'center' }
 ]
 
-const records = ref([])
+const filteredRecords = computed(() => {
+  if (!text.value) {
+    return patients.value
+  }
+
+  const lowerCaseText = text.value.toLowerCase()
+
+  return patients.value.filter(patient =>
+    patient.idCard.toLowerCase().includes(lowerCaseText)
+  )
+})
+
+const pagination = ref({
+  sortBy: 'fechaRegistro',
+  descending: true,
+  page: 1,
+  rowsPerPage: 11
+})
+
+async function getPatientsWithLastConsultation () {
+  const patientsRef = collection(firestore, 'DatosPersonales')
+  const patientsSnapshot = await getDocs(patientsRef)
+
+  patients.value = []
+  for (const doc of patientsSnapshot.docs) {
+    const patientData = doc.data()
+    const evolutionsRef = collection(doc.ref, 'Evolucion')
+    const evolutionsQuery = query(evolutionsRef, orderBy('fecha', 'desc'), limit(1))
+
+    try {
+      const evolutionsSnapshot = await getDocs(evolutionsQuery)
+      let lastConsultationDate = null
+
+      if (!evolutionsSnapshot.empty) {
+        lastConsultationDate = evolutionsSnapshot.docs[0].data().fecha
+        console.log(`Última fecha de evolución para ${patientData.name}: ${lastConsultationDate}`)
+      }
+
+      const fechaRegistro = patientData.fechaRegistro || null
+
+      patients.value.push({
+        ...patientData,
+        fecha: lastConsultationDate,
+        fechaRegistro
+      })
+    } catch (error) {
+      console.error(`Error al obtener las evoluciones para ${patientData.name}:`, error)
+    }
+  }
+}
+
+function isDeleteButtonVisible (fechaRegistro, lastConsultationDate) {
+  const today = dayjs()
+
+  const expirationDate = lastConsultationDate
+    ? dayjs(lastConsultationDate).add(10, 'year')
+    : dayjs(fechaRegistro).add(10, 'year')
+
+  console.log(`Fecha de vencimiento: ${expirationDate.format('DD/MM/YYYY')}`)
+
+  return expirationDate.isBefore(today)
+}
 
 const deleteRecord = async (idCard) => {
   const index = records.value.findIndex(record => record.idCard === idCard)
@@ -85,53 +199,25 @@ const deleteRecord = async (idCard) => {
   if (index !== -1) {
     const archivedRecord = records.value[index] // Guardar el registro a archivar
 
-    // Eliminar el registro de la lista activa
-    records.value.splice(index, 1)
-
-    // Guardar el registro archivado en Firestore
     const archivedCollectionRef = collection(firestore, 'archivedRecords')
     const archivedDocRef = doc(archivedCollectionRef, archivedRecord.idCard)
 
     try {
-      await setDoc(archivedDocRef, archivedRecord) // Guarda el registro en Firestore
+      // Archivar el registro en Firestore
+      await setDoc(archivedDocRef, archivedRecord)
       console.log('Registro archivado en Firestore:', archivedRecord)
 
-      // También eliminar el registro de la colección activa
-      const recordsCollectionRef = collection(firestore, 'DatosPersonales') // Cambia 'DatosPersonales' por tu colección real
+      const recordsCollectionRef = collection(firestore, 'DatosPersonales')
       const recordDocRef = doc(recordsCollectionRef, idCard)
-      await deleteDoc(recordDocRef) // Eliminar el documento de la colección activa
 
+      // Eliminar el registro de Firestore
+      await deleteDoc(recordDocRef)
       console.log('Registro eliminado de la colección activa:', idCard)
-
-      // Actualiza la lista de registros activos después de archivar
-      await loadRecords()
     } catch (error) {
       console.error('Error al archivar o eliminar el registro:', error)
     }
 
-    router.push({
-      path: '/archivosmuertos',
-      query: { archivedRecord: JSON.stringify(archivedRecord) }
-    })
-
     console.log('Registro archivado:', archivedRecord)
-  }
-}
-
-const loadRecords = async () => {
-  try {
-    const recordsCollection = collection(firestore, 'DatosPersonales') // Cambia 'DatosPersonales' por tu colección real
-    const recordsSnapshot = await getDocs(recordsCollection)
-
-    // Cargar solo los registros que no están archivados
-    records.value = recordsSnapshot.docs.map(doc => ({
-      idCard: doc.id,
-      ...doc.data()
-    }))
-
-    console.log('Registros activos:', records.value) // Para verificar los datos cargados
-  } catch (error) {
-    console.error('Error al cargar registros:', error)
   }
 }
 
@@ -141,7 +227,19 @@ const consultar = (rowData) => {
 }
 
 async function acceder (rowData) {
+  visible.value = true
   try {
+    const userEmail = auth.currentUser?.email
+
+    if (!userEmail) {
+      console.error('No hay un usuario autenticado.')
+      return
+    }
+
+    await signInWithEmailAndPassword(auth, userEmail, pass.value)
+
+    passError.value = false
+
     console.log('Consultando datos para idCard:', rowData.idCard)
     const docRef = doc(firestore, 'DatosPersonales', rowData.idCard)
     const motivosC = doc(firestore, 'MotivosConsulta', rowData.idCard)
@@ -183,6 +281,9 @@ async function acceder (rowData) {
           ta: combinedData.ta
         }
       })
+      visible.value = false
+
+      agregarNotificacion(`${userEmail} consulto la historia medica del paciente ${combinedData.name} ${combinedData.surname} el `)
     } else {
       if (!docSnap.exists()) {
         console.log('No se encontró el documento de DatosPersonales!')
@@ -192,14 +293,11 @@ async function acceder (rowData) {
       }
     }
   } catch (error) {
+    visible.value = false
     console.error('Error al consultar los datos personales:', error)
+    passError.value = true // Marca el error si las credenciales son incorrectas
   }
 }
-
-onMounted(() => {
-  getRecords()
-  loadRecords()
-})
 
 const getRecords = async () => {
   try {
@@ -211,19 +309,19 @@ const getRecords = async () => {
   }
 }
 
-const search = () => {
-  if (text.value) {
-    const searchText = text.value.toLowerCase()
-    filteredRecords.value = records.value.filter(record =>
-      record.idCard.toLowerCase().includes(searchText)
-    )
-  } else {
-    filteredRecords.value = records.value
-  }
-}
 </script>
 
 <style scoped>
+
+.error-input {
+  border-color: red !important; /* Cambia el color del borde a rojo */
+}
+
+.error-message {
+  color: red; /* Color del mensaje de error */
+  margin-top: 5px; /* Espaciado superior para el mensaje */
+}
+
 .my-card {
   height: 100vh;
 }

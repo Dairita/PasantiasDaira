@@ -10,7 +10,7 @@
       <q-card-section>
         <q-card-section style="text-align: left;">
           <div class="q-gutter-md" style="display: flex; flex-wrap: wrap;">
-         <q-input rounded filled v-model="Interconsulta" label="Interconsulta" :dense="dense" :rules="[val => val && val.length > 0 || 'No Dejes campos vacios']"
+         <q-input rounded filled v-model="Interconsulta" label="Interconsulta" :dense="dense" :disable="true" :rules="[val => val && val.length > 0 || 'No Dejes campos vacios']"
          :error="name === ''" :error-message="name === '' ? 'No Dejes campos vacios' : ''" style="flex: 1; min-width: 200px; margin-right: 10px;"></q-input>
 
          <q-input rounded filled v-model="cedula" label="Cédula" :dense="dense" :rules="[val => val && val.length > 0 || 'Por favor ingresa la cédula']"
@@ -105,7 +105,7 @@ async function save () {
     analisis: analisis.value,
     plant: plant.value,
     medico: medico.value,
-    fecha: medico.value
+    fecha: fecha.value
   })
 }
 

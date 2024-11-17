@@ -10,6 +10,7 @@
       :columns="columns"
       row-key="idCard"
       class="q-mt-md custom-table"
+      :rows-per-page-options="[filteredRecords.length]"
     >
       <template v-slot:top>
         <q-toolbar>
