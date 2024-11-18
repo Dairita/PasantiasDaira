@@ -1,7 +1,7 @@
 <template>
   <div style="position: relative;">
     <q-img
-      src="src/assets/Hospital-Adventista.jpg"
+      src="~assets/Hospital-Adventista.jpg"
       style="max-width: 2000px; max-height: 100vh;">
     </q-img>
 
