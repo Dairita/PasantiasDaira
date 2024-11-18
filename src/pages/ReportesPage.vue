@@ -1,19 +1,20 @@
 <template>
   <div>
-    <ReportesComponent/>
+     <!-- <ReportesComponent/> -->
+
   </div>
 </template>
 
 <script>
 
-import ReportesComponent from 'src/components/ReportesComponent.vue'
+/* import ReportesComponent from 'src/components/ReportesComponent.vue'
 
 export default {
   components: {
 
     ReportesComponent
   }
-}
+} */
 </script>t
 
 <style scoped>
