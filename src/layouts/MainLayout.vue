@@ -33,7 +33,7 @@
 
 <q-scroll-area class="fit" :horizontal-thumb-style="{ opacity: 0 }">
   <q-item-label header>
-    <img alt="logo" src="src/assets/images-removebg-preview.png" style="width: 50%; margin-left: 20%;" />
+    <img alt="logo" src="~assets/images-removebg-preview.png" style="width: 50%; margin-left: 20%;" />
   </q-item-label>
 
   <q-list padding>
@@ -221,7 +221,7 @@ const logout = async () => {
       await auth.signOut()
       console.log('Usuario ha cerrado sesión exitosamente.')
 
-      router.push('/')
+      router.replace('/')
     } catch (error) {
       console.error('Error al cerrar sesión:', error)
     }

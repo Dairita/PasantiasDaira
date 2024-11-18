@@ -1,6 +1,6 @@
 <template>
     <q-card class="login slide-in">
-      <img alt="Quasar logo" src="src/assets/images-removebg-preview.png" style="max-height: 150px; max-width: 150px; margin-top: -30%; margin-bottom: 20%; margin-left: 15%;"/>
+      <img alt="Quasar logo" src="~assets/images-removebg-preview.png" style="max-height: 150px; max-width: 150px; margin-top: -30%; margin-bottom: 20%; margin-left: 15%;"/>
       <q-input v-model="email" type="email" filled label="Email" style="min-width: 120%; margin-left: 10px; margin-left: -8%; background-color: #1e1e2f; border-radius: 16px; color: white; margin-bottom: 10%;"/>
       <q-input
       v-model="passw"
@@ -17,13 +17,13 @@
         />
       </template>
     </q-input>
-      <q-btn push type="submit" style="width: 80%; margin-top: 10%; margin-left: 10%; margin-bottom:20px ;" label="INGRESAR" color="green-8" @click="login()"/>
+      <q-btn push type="submit" style="width: 80%; margin-top: 10%; margin-left: 10%; margin-bottom:20px ;" label="INGRESAR" color="teal-9" @click="login()"/>
 
       <h8 class="texto-recuperacion" style="margin-left: 16%; margin-top: 20%;" @click="irArecuperacion">Olvidaste tu contraseña?</h8>
 
       <hr style="margin: 20px; border-top: 1px solid #ccc;"/>
 
-      <q-btn push type="submit" style="width: 80%; margin-top: 5%; margin-left: 10%;" label="REGISTRATE" color="green-8" @click="irARegistro()"/>
+      <q-btn push type="submit" style="width: 80%; margin-top: 5%; margin-left: 10%;" label="REGISTRATE" color="teal-8" @click="irARegistro()"/>
 
       <div v-if="errorMessage" style="margin-left: 16%; margin-top: 15px;">{{ errorMessage }}</div>
 
