@@ -32,7 +32,7 @@ async function recoverPass () {
   try {
     await sendPasswordResetEmail(auth, emailAddress.value)
 
-    alert('Alerta, se ha enviado un correo a su cuenta. Por favor sigue los pasos indicados.')
+    alert('Alerta, se ha enviado un correo a su cuenta. Por favor sigue los pasos')
   } catch (error) {
     console.error('Error al enviar el correo: ', error)
     alert('Ocurrió un error: ' + error.message)
