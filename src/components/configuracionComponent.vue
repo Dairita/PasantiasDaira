@@ -36,7 +36,8 @@
                       label="Cambiar contraseña"
                        icon="password"
                       color="teal-9"
-                      @click="$router.push('/correo')"
+                      :loading="isLoading"
+                      @click="handleChangePassword"
                       style="width: 50%; margin-left: -7%;"
                     />
                   </div>
@@ -52,16 +53,24 @@
 
                     <div v-if="showConfirmation" style="margin-top: 20px;">
                       <h5 style="color: green; font-weight: bold;">Eliminar Cuenta</h5>
-                      <input
-                        type="password"
-                        v-model="password"
-                        placeholder="Ingresa tu contraseña"
-                        style="margin-bottom: 10px; width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;"
-                      />
 
-                      <button @click="deleteAccount" style="padding: 10px 15px; border-radius: 4px; background-color: teal; color: white; border: none;">
-                        Eliminar Cuenta
-                      </button>
+                      <div style="display: flex; align-items: center; gap: 10px;">
+                        <q-input
+                          v-model="password"
+                          type="password"
+                          filled
+                          label="Ingresa tu contraseña"
+                          :dense="dense"
+                          style="width: 30%; background-color: #1e1e2f; border-radius: 16px; color: white; margin-left: 23%;"
+                        />
+
+                        <button
+                          @click="deleteAccount"
+                          style="padding: 10px 15px; border-radius: 4px; background-color: teal; color: white; border: none;"
+                        >
+                          Eliminar Cuenta
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -90,6 +99,18 @@ const db = getFirestore()
 
 const showConfirmation = ref(false)
 const password = ref('')
+const isLoading = ref(false)
+
+function handleChangePassword () {
+  isLoading.value = true // Activar el estado de loading
+
+  // Simular un retraso de 2 segundos
+  setTimeout(() => {
+    isLoading.value = false // Desactivar el estado de loading
+    // Navegar a la ruta deseada
+    router.push('/correo')
+  }, 2000)
+}
 
 onMounted(async () => {
   const user = auth.currentUser

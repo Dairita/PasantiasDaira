@@ -27,9 +27,9 @@
                 dense
                 dense-toggle
                 expand-separator
-                icon="perm_identity"
                 :label="user.username"
                 caption="Ajustes de la cuenta"
+                style="width: 100%;"
               >
               <template v-slot:header>
                 <q-item-section>
@@ -73,6 +73,7 @@
                   icon="perm_identity"
                   :label="user.username"
                   caption="Ajustes de la cuenta"
+                  style="width: 100%;"
                 >
                     <template v-slot:header>
                       <q-item-section>
@@ -144,6 +145,10 @@ import { collection, getDocs, doc, updateDoc, setDoc, getDoc } from 'firebase/fi
 import { firestore } from 'boot/firebase'
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
 
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
 const dialogVisible = ref(false)
 const selectedUser = ref({})
 function openDialog (user) {
@@ -175,6 +180,7 @@ const showSection = (section) => {
 }
 
 const registrar = async () => {
+  // Validar campos
   if (!username.value || !email.value || !pass.value || !verifiPass.value) {
     errorMessage.value = 'Todos los campos son obligatorios.'
     return
@@ -195,25 +201,41 @@ const registrar = async () => {
 
   try {
     const auth = getAuth()
+    const userCredential = await createUserWithEmailAndPassword(auth, email.value, pass.value)
 
-    await createUserWithEmailAndPassword(auth, email.value, pass.value)
+    const userDocRef = doc(firestore, 'usersColecction', userCredential.user.email)
 
-    const userDocRef = doc(firestore, 'usersColecction', email.value)
+    const fechaCreacion = new Date()
+
+    // Formatear la fecha en el formato deseado
+    const options = {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    }
+
+    const formattedDate = fechaCreacion.toLocaleString('es-ES', options).replace(',', '')
+
     await setDoc(userDocRef, {
       username: username.value,
-      email: email.value,
+      email: userCredential.user.email,
       role: 'user',
-      confirmed: true
+      confirmed: true,
+      fechaCreacion: formattedDate
+
     })
 
-    // Clear input fields
     username.value = ''
     email.value = ''
     pass.value = ''
     verifiPass.value = ''
     errorMessage.value = ''
 
-    alert('Registro exitoso. Puedes iniciar sesión ahora.')
+    alert('Registro exitoso')
+    router.push('/')
   } catch (error) {
     console.error('Error al registrar el usuario:', error)
     errorMessage.value = error.message
@@ -272,45 +294,13 @@ const commonUsers = computed(() => confirmedUsers.value.filter(user => user.role
 </script>
 
 <style scoped>
-.notificacion-rectangle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px;
-  border: 1px solid #ccc;
-  margin-bottom: 10px; /* Espaciado entre notificaciones */
-}
 
-.no-notificaciones {
-  text-align: center;
-  margin-top: 20px;
-  font-style: italic;
-}
-
-.notificacion-rectangle {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
-  margin: 10px 0;
-}
 .user-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   background-color: rgb(19, 94, 105); /* Fondo blanco para cada fila */
   box-shadow: 0px 2px 5px rgba(21, 8, 139, 0.5); /* Sombra gris claro */
-}
-.notificaciones-container {
-  height: 400px; /* Altura máxima */
-  width: 600%; /* Ancho máximo */
-  overflow-y: auto; /* Desplazamiento vertical si hay más contenido */
-  overflow-x: hidden; /* Ocultar desplazamiento horizontal */
-}
-.panel-container {
-  width: 100%;
-  height: 200%;
-  overflow: auto; /* Permite el desplazamiento si el contenido excede el tamaño */
 }
 
 .user-row {
@@ -325,25 +315,13 @@ const commonUsers = computed(() => confirmedUsers.value.filter(user => user.role
 }
 
 .user-row:hover {
-  transform: scale(1.02); /* Aumentar ligeramente el tamaño al pasar el mouse */
+  transform: scale(1.01); /* Aumentar ligeramente el tamaño al pasar el mouse */
 }
 
 .username {
   font-weight: bold; /* Hacer que el nombre de usuario esté en negrita */
 }
 
-.panel-container-width {
-  width: 10rem;  /* Ajusta el valor según tu diseño */
-  height: 30rem; /* Ajusta el valor según tu diseño */
-  display: flex; /* Permite que los elementos hijos se alineen correctamente */
-  flex-direction: column; /* Alinea los elementos en una columna */
-  padding: 1rem; /* Agrega un poco de espacio interno */
-  box-sizing: border-box; /* Asegura que el padding no afecte el tamaño total */
-}
-.notificaciones-container {
-  flex-grow: 1; /* Permite que este contenedor crezca para ocupar espacio disponible */
-  overflow-y: auto; /* Activa el desplazamiento vertical si es necesario */
-}
 .button-group {
   display: flex; /* Utiliza flexbox para alinear los botones */
   gap: 0.5rem; /* Espacio entre los botones */
