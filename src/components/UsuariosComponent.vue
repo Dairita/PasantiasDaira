@@ -20,13 +20,42 @@
               <div v-if="unconfirmedUsers.length === 0" class="no-requests" style="color: Black; text-align: center; font-size: 1.5em; padding: 10%;">
                 No hay solicitudes en este momento
               </div>
-              <div v-for="user in unconfirmedUsers" :key="user.id" class="user-row">
-                <span class="username">{{ user.username }}</span>
-                <span>{{ user.email }}</span>
-                <span>{{ user.role }}</span>
-                <div class="user-actions" style="display: flex; align-items: center;">
-                  <q-checkbox v-model="user.confirmed" @click="updateConfirmed(user)" />
-                </div>
+
+              <div v-for="user in unconfirmedUsers"  @click="openDialog(user)" :key="user.id" class="user-row">
+
+                <q-expansion-item
+                dense
+                dense-toggle
+                expand-separator
+                icon="perm_identity"
+                :label="user.username"
+                caption="Ajustes de la cuenta"
+              >
+              <template v-slot:header>
+                <q-item-section>
+                  <span>{{ user.username }}</span>
+                </q-item-section>
+              </template>
+
+              <q-card>
+                <q-card-section>
+                  <div><strong>Nombre:</strong> {{ user.username }}</div>
+                  <div><strong>Email:</strong> {{ user.email }}</div>
+                  <div><strong>Rol:</strong> {{ user.role }}</div>
+                  <div><strong>Fecha de creación:</strong> {{ user.fechaCreacion }}</div>
+                  <div>
+                    <strong>Cuenta: </strong>
+                    <span>{{ user.confirmed ? 'Activa' : 'Inactiva' }}</span>
+                    <q-toggle
+                      v-model="user.confirmed"
+                      @click="updateConfirmed(user)"
+                      :color="user.confirmed ? 'green' : 'red'"
+                    />
+                  </div>
+                  <q-btn icon="delete" text-color="red" round />
+               </q-card-section>
+              </q-card>
+            </q-expansion-item>
               </div>
             </div>
 
@@ -36,15 +65,41 @@
                 <span>{{ user.email }}</span>
                 <span>{{ user.role }}</span>
               </div>
-              <div v-for="user in commonUsers" :key="user.id" class="user-row">
-                <span>{{ user.username }}</span>
-                <span>{{ user.email }}</span>
-                <span>{{ user.role }}</span>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                  <q-checkbox v-model="user.confirmed" @click="updateConfirmed(user)" />
-                </div>
-              </div>
+              <div v-for="user in commonUsers" @click="openDialog(user)" :key="user.id" class="user-row">
+                <q-expansion-item
+                  dense
+                  dense-toggle
+                  expand-separator
+                  icon="perm_identity"
+                  :label="user.username"
+                  caption="Ajustes de la cuenta"
+                >
+                    <template v-slot:header>
+                      <q-item-section>
+                        <span>{{ user.username }}</span>
+                      </q-item-section>
+                    </template>
+
+                <q-card>
+                  <q-card-section>
+                    <div><strong>Nombre:</strong> {{ user.username }}</div>
+                    <div><strong>Email:</strong> {{ user.email }}</div>
+                    <div><strong>Rol:</strong> {{ user.role }}</div>
+                    <div><strong>Fecha de creación:</strong> {{ user.fechaCreacion }}</div>
+                    <div>
+                      <strong>Cuenta: </strong>
+                      <span>{{ user.confirmed ? 'Activa' : 'Inactiva' }}</span>
+                <q-toggle
+                  v-model="user.confirmed"
+                  @click="updateConfirmed(user)"
+                  :color="user.confirmed ? 'green' : 'red'"
+                />
+                    </div>
+                  </q-card-section>
+                </q-card>
+              </q-expansion-item>
             </div>
+          </div>
 
             <div v-else-if="currentSection === 'form'">
               <div class="q-pa-md relative-" style="height: 50%; margin-top: -10%">
@@ -76,7 +131,6 @@
                 </q-card-section>
               </div>
             </div>
-
           </q-card-section>
         </div>
       </div>
@@ -90,32 +144,12 @@ import { collection, getDocs, doc, updateDoc, setDoc, getDoc } from 'firebase/fi
 import { firestore } from 'boot/firebase'
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
 
-// import axios from 'axios'
-
-/* const confirmDeleteUser = async (uid) => {
-  try {
-    console.log(`Eliminando usuario con UID: ${uid}`)
-
-    // Llama al endpoint del servidor para eliminar el usuario
-    const response = await axios.delete(`http://localhost:3000/deleteUser/${uid}`)
-
-    if (response.data.success) {
-      // Eliminar el usuario de la lista local
-      users.value = users.value.filter(user => user.id !== uid)
-      console.log(response.data.message)
-    } else {
-      console.error('Error en la respuesta del servidor:', response.data.message)
-    }
-  } catch (error) {
-    if (error.response) {
-      console.error('Error en la respuesta del servidor:', error.response.data)
-    } else if (error.request) {
-      console.error('No se recibió respuesta del servidor:', error.request)
-    } else {
-      console.error('Error al configurar la solicitud:', error.message)
-    }
-  }
-} */
+const dialogVisible = ref(false)
+const selectedUser = ref({})
+function openDialog (user) {
+  selectedUser.value = user // Asignar el usuario seleccionado
+  dialogVisible.value = true // Mostrar el diálogo
+}
 
 onMounted(() => {
   cargarUsuarios()
@@ -263,11 +297,9 @@ const commonUsers = computed(() => confirmedUsers.value.filter(user => user.role
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
-  padding: 10px; /* Espaciado interno para mejor apariencia */
-  border-radius: 8px; /* Bordes redondeados */
-  background-color: rgb(95, 108, 110); /* Fondo blanco para cada fila */
-  box-shadow: 0px 2px 5px rgba(200, 200, 200, 0.5); /* Sombra gris claro */
+
+  background-color: rgb(19, 94, 105); /* Fondo blanco para cada fila */
+  box-shadow: 0px 2px 5px rgba(21, 8, 139, 0.5); /* Sombra gris claro */
 }
 .notificaciones-container {
   height: 400px; /* Altura máxima */

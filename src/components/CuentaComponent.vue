@@ -64,11 +64,28 @@ const registrar = async () => {
     const userCredential = await createUserWithEmailAndPassword(auth, email.value, pass.value)
 
     const userDocRef = doc(firestore, 'usersColecction', userCredential.user.email)
+
+    const fechaCreacion = new Date()
+
+    // Formatear la fecha en el formato deseado
+    const options = {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+    }
+
+    const formattedDate = fechaCreacion.toLocaleString('es-ES', options).replace(',', '')
+
     await setDoc(userDocRef, {
       username: username.value,
       email: userCredential.user.email,
       role: 'user',
-      confirmed: false
+      confirmed: false,
+      fechaCreacion: formattedDate
+
     })
 
     username.value = ''

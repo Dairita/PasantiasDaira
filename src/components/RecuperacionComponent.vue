@@ -38,31 +38,7 @@
 </template>
 
 <script setup>
-/* import { ref } from 'vue'
-import { getAuth, confirmPasswordReset } from 'firebase/auth'
-import { useRoute } from 'vue-router'
 
-async function handleResetPassword () {
-  const auth = getAuth()
-  const route = useRoute()
-  const code = route.query.oobCode // Token enviado por correo
-  const newPassword = ref('') // Nueva contraseña
-  const verifiPass = ref('') // Confirmación de nueva contraseña
-
-  if (newPassword.value !== verifiPass.value) {
-    alert('Las contraseñas no coinciden.')
-    return
-  }
-
-  try {
-    await confirmPasswordReset(auth, code, newPassword.value)
-    alert('Contraseña restablecida con éxito.')
-  } catch (error) {
-    console.error('Error al restablecer la contraseña: ', error)
-    alert('Ocurrió un error: ' + error.message)
-  }
-}
-*/
 </script>
 
 <style scoped>
