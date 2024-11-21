@@ -39,7 +39,7 @@
 <script setup>
 import { ref } from 'vue'
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { firestore } from 'boot/firebase'
 import { useRouter } from 'vue-router'
 
@@ -110,6 +110,9 @@ const login = async () => {
         console.log('Entraste como usuario común')
       }
 
+      const horaIngreso = formatDate(new Date())
+      await updateDoc(userDocRef, { horaIngreso })
+
       router.push('/menu')
       visible.value = false
     } else {
@@ -130,6 +133,12 @@ const login = async () => {
         break
     }
   }
+}
+
+const formatDate = (date) => {
+  const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true }
+  const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date)
+  return formattedDate.replace(',', '').replace('AM', 'AM').replace('PM', 'PM')
 }
 </script>
 
@@ -170,6 +179,12 @@ const login = async () => {
 
 .texto-recuperacion:hover {
   color: blue;
+}
+
+@media (max-width: 600px) {
+  body {
+    font-size: 1.2em; /* Aumentar el tamaño de fuente en pantallas pequeñas */
+  }
 }
 
 </style>

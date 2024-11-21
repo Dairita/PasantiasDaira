@@ -3,6 +3,7 @@
   <div style="margin-top: 7%;">
     <div class="q-gutter-md" style="margin-left: 15%;">
       <img alt="Quasar logo" src="src/assets/images-removebg-preview.png" style=" height: 150px; width: 150px; margin-top: -5%; margin-bottom: 2%; margin-left: -68%;"/>
+
      <q-input v-model="username" :class="{'error-input': usernameError}" filled label="Nombre de usuario" :dense="dense" style="width: 50%; margin-left: -8%; background-color: #1e1e2f; border-radius: 16px; color: white;"/>
       <q-input v-model="email" :class="{'error-input': emailError}" filled label="Email" :dense="dense" style="width: 50%; margin-left: -8%; background-color: #1e1e2f; border-radius: 16px; color: white;"/>
       <q-input v-model="pass" :class="{'error-input': passError}" filled :type="isPwd ? 'password' : 'text'" label="Contraseña" :dense="dense" style="width: 50%; margin-left: -8%; background-color: #1e1e2f; border-radius: 16px; color: white;">
@@ -16,7 +17,6 @@
     </div>
   </div>
 </form>
-
 </template>
 
 <script setup>
@@ -40,7 +40,6 @@ const passError = ref(false)
 const verifiPassError = ref(false)
 
 const registrar = async () => {
-  // Validar campos
   if (!username.value || !email.value || !pass.value || !verifiPass.value) {
     errorMessage.value = 'Todos los campos son obligatorios.'
     return

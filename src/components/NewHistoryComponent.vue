@@ -230,7 +230,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { doc, setDoc, getDoc } from 'firebase/firestore'
+import { doc, setDoc, getDoc, collection, addDoc } from 'firebase/firestore'
 import { firestore, db } from 'boot/firebase'
 import { getAuth } from 'firebase/auth'
 import useNotificaciones from 'boot/useNotificaciones'
@@ -389,7 +389,7 @@ const guardar = async () => {
     })
 
     // Guardar en Representante
-    const repre = doc(firestore, 'Representante', idCard.value)
+    const repre = doc(firestore, 'Representante', medico.value)
     await setDoc(repre, {
       idCard: idCard.value,
       representativeName: representativeName.value,
@@ -400,6 +400,25 @@ const guardar = async () => {
     console.log('Datos guardados correctamente')
 
     agregarNotificacion(`${medico.value} creó una historia médica del paciente ${name.value} ${surname.value} el `)
+
+    const auth = getAuth()
+    const user = auth.currentUser
+
+    if (user) {
+      const userDocRef = doc(firestore, 'usersColecction', user.email)
+      const mensaje = `creó una historia médica del paciente ${name.value} ${surname.value} el ${formatDate(new Date())}`
+
+      // Reference to the 'actividad' subcollection
+      const actividadCollectionRef = collection(userDocRef, 'actividad')
+
+      // Add the new message to the 'actividad' subcollection
+      try {
+        await addDoc(actividadCollectionRef, { mensaje })
+        console.log('Mensaje guardado en la subcolección actividad.')
+      } catch (error) {
+        console.error('Error al guardar el mensaje:', error)
+      }
+    }
 
     name.value = ''
     surname.value = ''
@@ -424,6 +443,12 @@ const guardar = async () => {
   } catch (error) {
     console.error('Error al guardar los datos:', error)
   }
+}
+
+const formatDate = (date) => {
+  const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true }
+  const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date)
+  return formattedDate.replace(',', '').replace('AM', 'AM').replace('PM', 'PM')
 }
 
 const message = ref('')

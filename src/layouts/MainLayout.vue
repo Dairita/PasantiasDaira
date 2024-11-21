@@ -10,6 +10,7 @@
             {{ notificationCount }}
           </q-badge>
           <q-tooltip>Notificaciones</q-tooltip>
+
         </q-btn>
 
           <div class="text-teal-9 text-bold">{{ userName }}</div>
@@ -85,8 +86,8 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { doc, getDoc } from 'firebase/firestore'
-import { firestore, auth } from 'boot/firebase'
+import { doc, getDoc, updateDoc } from 'firebase/firestore'
+import { firestore } from 'boot/firebase'
 import { useRouter, useRoute } from 'vue-router'
 
 import useNotificaciones from 'boot/useNotificaciones'
@@ -103,7 +104,6 @@ const showNotifications = () => {
   })
 }
 const router = useRouter()
-
 const loading = ref(false)
 const route = useRoute()
 
@@ -218,6 +218,15 @@ const logout = async () => {
 
   if (confirmation) {
     try {
+      const auth = getAuth()
+      const user = auth.currentUser
+
+      if (user) {
+        const userDocRef = doc(firestore, 'usersColecction', user.email)
+        const horaSalida = formatDate(new Date())
+        await updateDoc(userDocRef, { horaSalida })
+      }
+
       await auth.signOut()
       console.log('Usuario ha cerrado sesión exitosamente.')
 
@@ -229,6 +238,13 @@ const logout = async () => {
     console.log('Cierre de sesión cancelado.')
   }
 }
+
+const formatDate = (date) => {
+  const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true }
+  const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date)
+  return formattedDate.replace(',', '').replace('AM', 'AM').replace('PM', 'PM')
+}
+
 </script>
 
 <style scoped>
@@ -258,4 +274,16 @@ const logout = async () => {
   background-color: #2cb0c7;
 }
 
+.user-image-container {
+  width: 40px; /* Ajusta según sea necesario */
+  height: 40px; /* Ajusta según sea necesario */
+  border-radius: 50%; /* Para hacerla circular */
+  overflow: hidden; /* Para ocultar cualquier desbordamiento */
+  margin-left: auto; /* Para alinear a la derecha */
+}
+
+.user-image {
+  width: 100%;
+  height: auto;
+}
 </style>

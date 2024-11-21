@@ -82,10 +82,10 @@
 <script setup>
 
 import { ref, onMounted, computed } from 'vue'
-import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, orderBy, limit, query } from 'firebase/firestore'
+import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, orderBy, limit, query, addDoc } from 'firebase/firestore'
 import { firestore, auth } from 'boot/firebase'
 import { useRouter } from 'vue-router'
-import { signInWithEmailAndPassword } from 'firebase/auth'
+import { signInWithEmailAndPassword, getAuth } from 'firebase/auth'
 import useNotificaciones from 'boot/useNotificaciones'
 import dayjs from 'dayjs'
 import * as XLSX from 'xlsx'
@@ -281,9 +281,28 @@ async function acceder (rowData) {
           ta: combinedData.ta
         }
       })
-      visible.value = false
 
+      visible.value = false
       agregarNotificacion(`${userEmail} consulto la historia medica del paciente ${combinedData.name} ${combinedData.surname} el `)
+
+      const auth = getAuth()
+      const user = auth.currentUser
+
+      if (user) {
+        const userDocRef = doc(firestore, 'usersColecction', user.email)
+        const mensaje = `consulto la historia medica del paciente ${combinedData.name} ${combinedData.surname} el ${formatDate(new Date())}`
+
+        // Reference to the 'actividad' subcollection
+        const actividadCollectionRef = collection(userDocRef, 'actividad')
+
+        // Add the new message to the 'actividad' subcollection
+        try {
+          await addDoc(actividadCollectionRef, { mensaje })
+          console.log('Mensaje guardado en la subcolección actividad.')
+        } catch (error) {
+          console.error('Error al guardar el mensaje:', error)
+        }
+      }
     } else {
       if (!docSnap.exists()) {
         console.log('No se encontró el documento de DatosPersonales!')
@@ -297,6 +316,12 @@ async function acceder (rowData) {
     console.error('Error al consultar los datos personales:', error)
     passError.value = true // Marca el error si las credenciales son incorrectas
   }
+}
+
+const formatDate = (date) => {
+  const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true }
+  const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date)
+  return formattedDate.replace(',', '').replace('AM', 'AM').replace('PM', 'PM')
 }
 
 const getRecords = async () => {

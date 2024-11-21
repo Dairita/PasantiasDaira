@@ -40,7 +40,7 @@
     <q-btn @click="salir" icon="cancel" color="red" round style="margin-left: 100%; margin-top: -5%;"/>
         <q-card class="my-card bg-white text-black" style="margin-bottom: 1%; margin-top: -5%; border-radius: 50px; border: 2px solid #007A7C;">
           <div class="row justify-content-start align-items-center" style="margin-top: 5%;">
-            <img alt="Quasar logo" src="src/assets/images-removebg-preview.png" style="max-width: 1300px; max-height: 1300px; margin-right: 20px; margin-left: 5%;"/>
+            <img alt="Quasar logo" src="~src/assets/images-removebg-preview.png" style="max-width: 1300px; max-height: 1300px; margin-right: 20px; margin-left: 5%;"/>
 
             <div style="margin-top: 5%;">
             <div style="text-align: left;">
@@ -378,7 +378,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { doc, setDoc, collection, getDocs, getDoc } from 'firebase/firestore'
+import { doc, setDoc, collection, getDocs, getDoc, addDoc } from 'firebase/firestore'
 import { firestore, db } from 'boot/firebase'
 import { useRoute } from 'vue-router'
 import { getAuth } from 'firebase/auth'
@@ -694,12 +694,35 @@ async function save () {
 
     agregarNotificacion(`${medicoEEV.value} añadio una evolucion del paciente ${name.value} ${surname.value} el.`)
 
+    const auth = getAuth()
+    const user = auth.currentUser
+
+    if (user) {
+      const userDocRef = doc(firestore, 'usersColecction', user.email)
+      const mensaje = `añadio una evolucion del paciente ${name.value} ${surname.value} el ${formatDate(new Date())}`
+
+      // Reference to the 'actividad' subcollection
+      const actividadCollectionRef = collection(userDocRef, 'actividad')
+
+      // Add the new message to the 'actividad' subcollection
+      try {
+        await addDoc(actividadCollectionRef, { mensaje })
+        console.log('Mensaje guardado en la subcolección actividad.')
+      } catch (error) {
+        console.error('Error al guardar el mensaje:', error)
+      }
+    }
+
     limpiarCampos()
   } catch (error) {
     console.error('Error al guardar evolución:', error)
   }
 }
-
+const formatDate = (date) => {
+  const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true }
+  const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date)
+  return formattedDate.replace(',', '').replace('AM', 'AM').replace('PM', 'PM')
+}
 const setFechaActual = () => {
   const hoy = new Date()
   const dia = String(hoy.getDate()).padStart(2, '0')
@@ -789,7 +812,7 @@ onMounted(() => {
 }
 
 .btn-image {
-  width: 100px; /* Ajusta el tamaño de la imagen según sea necesario */
+  width: 100px;
   height: auto; /* Mantiene la proporción de la imagen */
   margin-bottom: -5%;
 }
@@ -799,5 +822,11 @@ onMounted(() => {
   width: 100px; /* Ajusta el tamaño de la imagen según sea necesario */
   height: auto; /* Mantiene la proporción de la imagen */
   margin-bottom: -5%;
+}
+
+@media (max-width: 600px) {
+  body {
+    font-size: 1.2em; /* Aumentar el tamaño de fuente en pantallas pequeñas */
+  }
 }
 </style>

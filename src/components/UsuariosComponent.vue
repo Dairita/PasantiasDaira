@@ -8,13 +8,20 @@
       <q-toolbar-title>Solicitudes de acceso</q-toolbar-title>
 
       <q-btn flat round dense icon="account_circle" class="q-mr-xs" @click="showSection('confirmed')" />
-      <q-btn flat round dense icon="add_circle" class="q-mr-xs" @click="showSection('form')" />
+      <q-btn flat round dense icon="add_circle" class="q-mr-xs" @click="showSection('form')"/>
     </q-toolbar>
 
-    <form @submit.prevent="updateUser" style="padding: 150px; text-align: center; min-width: 100%; background-image: linear-gradient( #1989,#3333);">
+    <form style="padding: 50px; text-align: center; min-width: 50%; background-image: linear-gradient( #1989,#3333);">
+    <form @submit.prevent="updateUser" class="centered-form" >
       <div style="margin-top: 7%;">
         <div class="q-gutter-md" style="margin-left: 3px;">
           <q-card-section style="padding: 1%; margin-top: 5%;">
+            <h3 style="margin-top: -5%; font-weight: bold; font-family: 'Arial', sans-serif;">
+              Usuarios
+              <q-btn flat round style="height: 50px; width: 50px;">
+                <q-icon name="supervisor_account" size="50px" color="teal-10" style="margin-top: -10%; margin-right: 50%;"/>
+            </q-btn>
+            </h3>
 
             <div v-if="currentSection === 'unconfirmed'">
               <div v-if="unconfirmedUsers.length === 0" class="no-requests" style="color: Black; text-align: center; font-size: 1.5em; padding: 10%;">
@@ -43,6 +50,8 @@
                   <div><strong>Email:</strong> {{ user.email }}</div>
                   <div><strong>Rol:</strong> {{ user.role }}</div>
                   <div><strong>Fecha de creación:</strong> {{ user.fechaCreacion }}</div>
+                  <div><strong>Ultima hora de ingreso:</strong> {{ user.horaIngreso }}</div>
+                  <div><strong>Ultima hora de salida:</strong> {{ user.horaSalida }}</div>
                   <div>
                     <strong>Cuenta: </strong>
                     <span>{{ user.confirmed ? 'Activa' : 'Inactiva' }}</span>
@@ -52,9 +61,32 @@
                       :color="user.confirmed ? 'green' : 'red'"
                     />
                   </div>
-                  <q-btn icon="delete" text-color="red" round />
+                  <q-btn color="teal-9" label="Actividad del Usuario" @click="mostrarDialogo(user)" />
                </q-card-section>
               </q-card>
+              <q-dialog v-model="dialogv">
+                <q-card>
+                  <q-card-section>
+                    <div class="text-h6">Actividad del Usuario</div>
+                  </q-card-section>
+
+                  <q-separator />
+
+                  <q-card-section style="max-height: 50vh; overflow-y: auto;">
+                    <div v-if="loading">Cargando actividad...</div>
+                    <ul v-else>
+                      <li v-for="(activity, index) in activities" :key="index">{{ activity.mensaje }}</li>
+                    </ul>
+                    <div v-if="!activities.length">No hay actividad registrada.</div>
+                  </q-card-section>
+
+                  <q-separator />
+
+                  <q-card-actions align="right">
+                    <q-btn flat label="Cerrar" color="primary" @click="dialogv = false" />
+                  </q-card-actions>
+                </q-card>
+              </q-dialog>
             </q-expansion-item>
               </div>
             </div>
@@ -66,6 +98,7 @@
                 <span>{{ user.role }}</span>
               </div>
               <div v-for="user in commonUsers" @click="openDialog(user)" :key="user.id" class="user-row">
+
                 <q-expansion-item
                   dense
                   dense-toggle
@@ -87,23 +120,51 @@
                     <div><strong>Email:</strong> {{ user.email }}</div>
                     <div><strong>Rol:</strong> {{ user.role }}</div>
                     <div><strong>Fecha de creación:</strong> {{ user.fechaCreacion }}</div>
+                    <div><strong>Ultima hora de ingreso:</strong> {{ user.horaIngreso }}</div>
+                    <div><strong>Ultima hora de salida:</strong> {{ user.horaSalida }}</div>
                     <div>
                       <strong>Cuenta: </strong>
                       <span>{{ user.confirmed ? 'Activa' : 'Inactiva' }}</span>
-                <q-toggle
-                  v-model="user.confirmed"
-                  @click="updateConfirmed(user)"
-                  :color="user.confirmed ? 'green' : 'red'"
-                />
+                      <q-toggle
+                        v-model="user.confirmed"
+                        @click="updateConfirmed(user)"
+                        :color="user.confirmed ? 'green' : 'red'"
+                      />
                     </div>
+                    <q-btn color="teal-9" label="Actividad del Usuario" @click="mostrarDialogo(user)" />
                   </q-card-section>
                 </q-card>
+
+                <q-dialog v-model="dialogv">
+                  <q-card>
+                    <q-card-section>
+                      <div class="text-h6">Actividad del Usuario</div>
+                    </q-card-section>
+
+                    <q-separator />
+
+                    <q-card-section style="max-height: 50vh; overflow-y: auto;">
+                      <div v-if="loading">Cargando actividad...</div>
+                      <ul v-else>
+                        <li v-for="(activity, index) in activities" :key="index">{{ activity.mensaje }}</li>
+                      </ul>
+                      <div v-if="!activities.length">No hay actividad registrada.</div>
+                    </q-card-section>
+
+                    <q-separator />
+
+                    <q-card-actions align="right">
+                      <q-btn flat label="Cerrar" color="primary" @click="dialogv = false" />
+                    </q-card-actions>
+                  </q-card>
+                </q-dialog>
+
               </q-expansion-item>
             </div>
           </div>
 
             <div v-else-if="currentSection === 'form'">
-              <div class="q-pa-md relative-" style="height: 50%; margin-top: -10%">
+              <div class="q-pa-md relative-" style="height: 50%; margin-top: -3%">
                 <q-card-section class="text-h6">Nuevo usuario</q-card-section>
 
                 <q-card-section class="text-subtitle1" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
@@ -136,24 +197,72 @@
         </div>
       </div>
     </form>
+  </form>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
-import { collection, getDocs, doc, updateDoc, setDoc, getDoc } from 'firebase/firestore'
+import { collection, getDocs, doc, updateDoc, setDoc, getDoc, getFirestore } from 'firebase/firestore'
 import { firestore } from 'boot/firebase'
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
-
 import { useRouter } from 'vue-router'
 
-const router = useRouter()
-
-const dialogVisible = ref(false)
+const dialogv = ref(false) // Asegúrate de definir esta variable
+const activities = ref([])
+const loading = ref(false)
 const selectedUser = ref({})
+
+const confirmedUsers = computed(() => users.value.filter(user => user.confirmed))
+const unconfirmedUsers = computed(() => users.value.filter(user => !user.confirmed))
+const adminUsers = computed(() => users.value.filter(user => user.role === 'admin'))
+const commonUsers = computed(() => confirmedUsers.value.filter(user => user.role === 'user'))
+
+const mostrarDialogo = async (user) => {
+  console.log(user.email)
+  if (!user || !user.email) {
+    console.error('El usuario o el email del usuario están indefinidos')
+    return // Salir si el usuario no es válido
+  }
+
+  selectedUser.value = user // Guarda el usuario seleccionado
+  loading.value = true
+  dialogv.value = true // Cambia a true para mostrar el diálogo
+
+  const firestore = getFirestore()
+  const userDocRef = doc(firestore, 'usersColecction', user.email) // Asegúrate de que user.email sea válido
+  const actividadCollectionRef = collection(userDocRef, 'actividad')
+
+  try {
+    const querySnapshot = await getDocs(actividadCollectionRef)
+    activities.value = querySnapshot.docs.map(doc => doc.data())
+  } catch (error) {
+    console.error('Error al obtener las actividades:', error)
+    activities.value = []
+  } finally {
+    loading.value = false // Asegúrate de restablecer el estado de carga
+  }
+}
+
+const cargarUsuarios = async () => {
+  try {
+    const usersSnapshot = await getDocs(collection(firestore, 'usersColecction'))
+    users.value = usersSnapshot.docs.map(userDoc => {
+      const userData = userDoc.data()
+      userData.id = userDoc.id
+      return userData
+    })
+  } catch (error) {
+    console.error('Error al cargar usuarios:', error)
+  }
+}
+
+const router = useRouter()
+const dialogVisible = ref(false)
+
 function openDialog (user) {
-  selectedUser.value = user // Asignar el usuario seleccionado
-  dialogVisible.value = true // Mostrar el diálogo
+  selectedUser.value = user
+  dialogVisible.value = true
 }
 
 onMounted(() => {
@@ -180,7 +289,6 @@ const showSection = (section) => {
 }
 
 const registrar = async () => {
-  // Validar campos
   if (!username.value || !email.value || !pass.value || !verifiPass.value) {
     errorMessage.value = 'Todos los campos son obligatorios.'
     return
@@ -207,7 +315,6 @@ const registrar = async () => {
 
     const fechaCreacion = new Date()
 
-    // Formatear la fecha en el formato deseado
     const options = {
       day: '2-digit',
       month: '2-digit',
@@ -235,7 +342,7 @@ const registrar = async () => {
     errorMessage.value = ''
 
     alert('Registro exitoso')
-    router.push('/')
+    router.replace('/')
   } catch (error) {
     console.error('Error al registrar el usuario:', error)
     errorMessage.value = error.message
@@ -262,19 +369,6 @@ watch([pass, verifiPass], () => {
   }
 })
 
-const cargarUsuarios = async () => {
-  try {
-    const usersSnapshot = await getDocs(collection(firestore, 'usersColecction'))
-    users.value = usersSnapshot.docs.map(userDoc => {
-      const userData = userDoc.data()
-      userData.id = userDoc.id
-      return userData
-    })
-  } catch (error) {
-    console.error('Error al cargar usuarios:', error)
-  }
-}
-
 const updateConfirmed = async (user) => {
   console.log('Cambié el estado del checkbox a:', user.confirmed)
   try {
@@ -285,11 +379,6 @@ const updateConfirmed = async (user) => {
     console.error('Error al guardar el estado:', error)
   }
 }
-
-const confirmedUsers = computed(() => users.value.filter(user => user.confirmed))
-const unconfirmedUsers = computed(() => users.value.filter(user => !user.confirmed))
-const adminUsers = computed(() => users.value.filter(user => user.role === 'admin'))
-const commonUsers = computed(() => confirmedUsers.value.filter(user => user.role === 'user'))
 
 </script>
 
@@ -325,5 +414,25 @@ const commonUsers = computed(() => confirmedUsers.value.filter(user => user.role
 .button-group {
   display: flex; /* Utiliza flexbox para alinear los botones */
   gap: 0.5rem; /* Espacio entre los botones */
+}
+
+@media (max-width: 600px) {
+  body {
+    font-size: 1.2em; /* Aumentar el tamaño de fuente en pantallas pequeñas */
+  }
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center horizontally */
+}
+
+.centered-form {
+  text-align: center;
+  width: 50%;
+  margin-top: -20px; /* Add space between the toolbar and the form */
+  padding: 50px; /* Optional padding for better appearance */
+  margin-left: 25%;
 }
 </style>
