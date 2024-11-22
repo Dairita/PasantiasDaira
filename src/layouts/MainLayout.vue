@@ -18,19 +18,17 @@
 
       </q-header>
 
-  <q-drawer
-  v-model="drawer"
-  show-if-above
-
-  :mini="miniState"
-  @mouseenter="miniState = false"
-  @mouseleave="miniState = true"
-
-  :width="250"
-  :breakpoint="500"
-  bordered
-  :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-3'"
->
+      <q-drawer
+      v-model="drawer"
+      show-if-above
+      :mini="miniState"
+      @mouseenter="openDrawer"
+      @mouseleave="closeDrawer"
+      :width="250"
+      :breakpoint="500"
+      bordered
+      :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-3'"
+    >
 
 <q-scroll-area class="fit" :horizontal-thumb-style="{ opacity: 0 }">
   <q-item-label header>
@@ -68,16 +66,21 @@
     </q-item>
   </q-list>
 </q-scroll-area>
+
+<div class="q-mini-drawer-hide absolute" style="top: 15px; right: -17px">
+  <q-btn
+    dense
+    round
+    unelevated
+    color="teal-9"
+    icon="chevron_left"
+   @click="toggleMiniState"
+  />
+</div>
 </q-drawer>
 
 <q-page-container>
   <router-view />
-  <q-inner-loading
-    :showing="loading"
-    label="Please wait..."
-    label-class="text-teal"
-    label-style="font-size: 1.1em"
-  />
 </q-page-container>
   </q-layout>
 
@@ -89,11 +92,9 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { firestore } from 'boot/firebase'
 import { useRouter, useRoute } from 'vue-router'
-
 import useNotificaciones from 'boot/useNotificaciones'
 
 const { contarNotificacionesNoVistas, obtenerNotificaciones } = useNotificaciones()
-
 const notificationCount = computed(() => contarNotificacionesNoVistas())
 
 const showNotifications = () => {
@@ -103,6 +104,7 @@ const showNotifications = () => {
     notif.visto = true
   })
 }
+
 const router = useRouter()
 const loading = ref(false)
 const route = useRoute()
@@ -111,7 +113,7 @@ const startLoading = () => {
   loading.value = true
   setTimeout(() => {
     loading.value = false
-  }, 5000)
+  }, 7000)
 }
 
 watch(route, (to) => {
@@ -125,7 +127,14 @@ watch(route, (to) => {
 const userName = ref('')
 const drawer = ref(false)
 const miniState = ref(true)
-const visible = ref(false)
+
+const openDrawer = () => {
+  miniState.value = false // Abre el drawer al pasar el mouse
+}
+
+const toggleMiniState = () => {
+  miniState.value = !miniState.value // Cambia entre mini y normal
+}
 
 onMounted(async () => {
   const auth = getAuth()
@@ -145,16 +154,6 @@ onMounted(async () => {
 })
 
 const isAdmin = computed(() => userRole.value === 'admin')
-
-const navigateTo = (link) => {
-  visible.value = true
-
-  router.push(link).then(() => {
-    setTimeout(() => {
-      visible.value = false
-    }, 5000)
-  })
-}
 
 defineOptions({
   name: 'MainLayout'

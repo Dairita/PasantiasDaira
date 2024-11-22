@@ -25,7 +25,7 @@
 
       <q-btn push type="submit" style="width: 80%; margin-top: 5%; margin-left: 10%;" label="REGISTRATE" color="teal-8" @click="irARegistro()"/>
 
-      <div v-if="errorMessage" style="margin-left: 16%; margin-top: 15px;">{{ errorMessage }}</div>
+      <div v-if="errorMessage" style="margin-left: 15%; margin-top: 15px;">{{ errorMessage }}</div>
 
       <q-inner-loading
         :showing="visible && !errorMessage"
@@ -55,7 +55,6 @@ const userRole = ref('')
 
 const showPassword = ref(false)
 
-// Función para alternar la visibilidad de la contraseña
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value
 }
@@ -106,14 +105,14 @@ const login = async () => {
       }
       if (userData.role === 'admin') {
         console.log('Entraste como usuario administrador')
+        router.replace('/usuarios')
       } else if (userData.role === 'user') {
         console.log('Entraste como usuario común')
+        router.replace('/registros')
       }
 
       const horaIngreso = formatDate(new Date())
       await updateDoc(userDocRef, { horaIngreso })
-
-      router.push('/menu')
       visible.value = false
     } else {
       console.log('El usuario no existe en la base de datos')

@@ -5,63 +5,42 @@
     <div style="display: flex; align-items: center;"/>
 
     <q-table
-      v-model:pagination="pagination"
-      :rows="filteredRecords"
-      :columns="columns"
-      row-key="id"
-      :rows-per-page-options="[12]"
-      class="q-mt-md custom-table"
-      style="background-color: rgba(230, 230, 250, 0.0);  border: 20px; width: 100%; height: 90%; margin-top: -5%; background-image: linear-gradient( #1989, #3333);">
+    v-model:pagination="pagination"
+    :rows="filteredRecords"
+    :columns="columns"
+    row-key="id"
+    :rows-per-page-options="[12]"
+    class="q-mt-md custom-table"
+    style="background-color: rgba(230, 230, 250, 0.9); border: 20px; width: 100%; height: 90%; margin-top: -5%; background-image: linear-gradient(#1989, #3333);">
 
       <template v-slot:top>
         <q-toolbar>
-          <q-toolbar-title  style="font-size: 1.2em; font-weight: bold;">Registros Médicos</q-toolbar-title>
+          <q-toolbar-title style="font-size: 1.9em; font-weight: bold;">Registros Médicos</q-toolbar-title>
           <div style="display: flex; align-items: center;">
-            <q-input standout v-model="text" label=" Buscar Cédula" mask="##.###.###" style="border-radius: 30px; background-color: rgba(0, 122, 124, 0.7);"/>
-
-            <q-btn @click="exportToExcel" class="q-mb-md custom-btn" color="red" style="width: 60px; height: 60px; margin-left: 5%; display: flex; align-items: center; justify-content: center;">
+            <q-input standout v-model="text" label="Buscar Cédula" mask="##.###.###" style="border-radius: 5px; background-color: rgba(3, 122, 124, 0.7);"/>
+            <q-btn @click="exportToExcel" class="q-mb-md" color="red" style="margin-top: 5%; width: 40px; height: 40px; margin-left: 5%; display: flex; align-items: center; justify-content: center; padding: 20px;">
               <q-icon name="view_list" size="24px" class="zoom-icon" />
-              </q-btn>
+            </q-btn>
           </div>
         </q-toolbar>
       </template>
 
       <template v-slot:body-cell-actions="props">
-        <q-td :props="props" style="font-size: 1.1em;">
+        <q-td :props="props" style="font-size: 2.0em;">
           <q-btn @click="consultar(props.row)" color="cyan-9" icon="person_search"/>
-          <q-btn @click="deleteRecord(props.row.idCard)" icon="delete" v-if="isDeleteButtonVisible(props.row.fechaRegistro, props.row.fecha)" color="negative" style="margin-left: 10px;"/>
+          <q-btn @click="deleteRecord(props.row.idCard)" icon="delete" v-if="isDeleteButtonVisible(props.row.fechaRegistro, props.row.fecha)" color="negative" style="margin-left: -10px;"/>
+        </q-td>
+      </template>
 
+</q-table>
     <q-dialog v-model="persistent" transition-show="scale" transition-hide="scale">
-      <q-card class="black patients.idCard-white" style="width: 3000px">
+      <q-card class="black patients.idCard-white" style="width: 400px">
         <q-card-section>
-          <div class="patients.idCard-h6">Acceso a historia medica</div>
+          <div class="patients.idCard-h6">Historia Medica</div>
+          <q-card-section style="margin-left: 10%;">
+            <q-btn @click="acceder(selectedRow)" label="Acceso a historia medica" icon="search" color="teal-9"/>
+          </q-card-section>
         </q-card-section>
-
-        <q-card-section class="q-pa-md" style="margin-left: 20%;" >
-          <p>ingresa tu contraseña</p>
-          <q-input
-          v-model="pass"
-          :class="{'error-input': passError}"
-          filled
-          :type="isPwd ? 'password' : 'text'"
-          label="Contraseña"
-          :dense="dense"
-          style="width: 50%; margin-left: 10%; background-color: #1e1e2f; border-radius: 16px; color: white;"
-        >
-          <template v-slot:append>
-            <q-icon
-              :name="isPwd ? 'visibility_off' : 'visibility'"
-              @click="isPwd = !isPwd"
-              style="cursor: pointer;"
-            />
-          </template>
-
-        </q-input>
-        <div v-if="passError" class="error-message">La contraseña es incorrecta.</div>
-        </q-card-section>
-        <q-card-actions align="right" class="q-pa-md">
-          <q-btn @click="acceder(selectedRow)" icon="search" color="teal-9"/>
-        </q-card-actions>
         <q-inner-loading
           :showing="visible"
           label="Please wait..."
@@ -70,11 +49,6 @@
         />
       </q-card>
     </q-dialog>
-
-        </q-td>
-
-      </template>
-    </q-table>
   </div>
 
 </template>
@@ -83,34 +57,28 @@
 
 import { ref, onMounted, computed } from 'vue'
 import { collection, getDocs, doc, getDoc, setDoc, deleteDoc, orderBy, limit, query, addDoc } from 'firebase/firestore'
-import { firestore, auth } from 'boot/firebase'
+import { firestore } from 'boot/firebase'
 import { useRouter } from 'vue-router'
-import { signInWithEmailAndPassword, getAuth } from 'firebase/auth'
-import useNotificaciones from 'boot/useNotificaciones'
+import { getAuth } from 'firebase/auth'
+// import useNotificaciones from 'boot/useNotificaciones'
 import dayjs from 'dayjs'
 import * as XLSX from 'xlsx'
 
 function exportToExcel () {
   const worksheet = XLSX.utils.json_to_sheet(patients.value)
   const workbook = XLSX.utils.book_new()
-
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Patients')
-
-  // Generate buffer and create a downloadable file
   XLSX.writeFile(workbook, 'patients_data.xlsx')
 }
 
-const { agregarNotificacion } = useNotificaciones()
+// const { agregarNotificacion } = useNotificaciones()
 
 const router = useRouter()
 const persistent = ref(false)
 const selectedRow = ref(null)
 const patients = ref([])
 const records = ref([])
-
-const pass = ref('')
 const passError = ref(false)
-const isPwd = ref(true)
 const visible = ref(false)
 
 onMounted(() => {
@@ -183,13 +151,10 @@ async function getPatientsWithLastConsultation () {
 
 function isDeleteButtonVisible (fechaRegistro, lastConsultationDate) {
   const today = dayjs()
-
   const expirationDate = lastConsultationDate
     ? dayjs(lastConsultationDate).add(10, 'year')
     : dayjs(fechaRegistro).add(10, 'year')
-
   console.log(`Fecha de vencimiento: ${expirationDate.format('DD/MM/YYYY')}`)
-
   return expirationDate.isBefore(today)
 }
 
@@ -197,20 +162,18 @@ const deleteRecord = async (idCard) => {
   const index = records.value.findIndex(record => record.idCard === idCard)
 
   if (index !== -1) {
-    const archivedRecord = records.value[index] // Guardar el registro a archivar
+    const archivedRecord = records.value[index]
 
     const archivedCollectionRef = collection(firestore, 'archivedRecords')
     const archivedDocRef = doc(archivedCollectionRef, archivedRecord.idCard)
 
     try {
-      // Archivar el registro en Firestore
       await setDoc(archivedDocRef, archivedRecord)
       console.log('Registro archivado en Firestore:', archivedRecord)
 
       const recordsCollectionRef = collection(firestore, 'DatosPersonales')
       const recordDocRef = doc(recordsCollectionRef, idCard)
 
-      // Eliminar el registro de Firestore
       await deleteDoc(recordDocRef)
       console.log('Registro eliminado de la colección activa:', idCard)
     } catch (error) {
@@ -229,15 +192,6 @@ const consultar = (rowData) => {
 async function acceder (rowData) {
   visible.value = true
   try {
-    const userEmail = auth.currentUser?.email
-
-    if (!userEmail) {
-      console.error('No hay un usuario autenticado.')
-      return
-    }
-
-    await signInWithEmailAndPassword(auth, userEmail, pass.value)
-
     passError.value = false
 
     console.log('Consultando datos para idCard:', rowData.idCard)
@@ -283,19 +237,15 @@ async function acceder (rowData) {
       })
 
       visible.value = false
-      agregarNotificacion(`${userEmail} consulto la historia medica del paciente ${combinedData.name} ${combinedData.surname} el `)
+      // agregarNotificacion(`${combinedData.medico} consulto la historia medica del paciente ${combinedData.name} ${combinedData.surname} el `)
 
       const auth = getAuth()
       const user = auth.currentUser
 
       if (user) {
         const userDocRef = doc(firestore, 'usersColecction', user.email)
-        const mensaje = `consulto la historia medica del paciente ${combinedData.name} ${combinedData.surname} el ${formatDate(new Date())}`
-
-        // Reference to the 'actividad' subcollection
+        const mensaje = `Accedió la historia medica del paciente ${combinedData.name} ${combinedData.surname} el ${formatDate(new Date())}`
         const actividadCollectionRef = collection(userDocRef, 'actividad')
-
-        // Add the new message to the 'actividad' subcollection
         try {
           await addDoc(actividadCollectionRef, { mensaje })
           console.log('Mensaje guardado en la subcolección actividad.')
@@ -314,7 +264,7 @@ async function acceder (rowData) {
   } catch (error) {
     visible.value = false
     console.error('Error al consultar los datos personales:', error)
-    passError.value = true // Marca el error si las credenciales son incorrectas
+    passError.value = true
   }
 }
 
@@ -353,14 +303,7 @@ const getRecords = async () => {
 
 .custom-table {
   color: black; /* Set text color to black */
+
 }
 
-/* Increase font size for table headers */
-.custom-table .q-th {
-  font-size: 30px !important; /* Use !important to enforce the style */
-}
-/* Increase font size for table cells */
-.custom-table .q-td {
-  font-size: 18px; /* Adjust as needed */
-}
 </style>

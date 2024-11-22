@@ -1,1 +1,10 @@
-// app global css in SCSS form
+// src/css/app.scss
+body {
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  body {
+    font-size: 12px; // Ajusta el tamaño de fuente para pantallas pequeñas
+  }
+}

@@ -1,13 +1,14 @@
 <template>
-  <div class="q-pa-md" style="height: 100vh; display: flex; flex-direction: column; align-items: center;">
-    <q-card class="my-card text-black" style="margin-bottom: 5%; min-width: 100%; background-image: linear-gradient( #1989, #3333);">
-      <q-card class="my-card text-black" style="margin-left: 25%; width: 100vh; height: 100vh; background-color: transparent; border: 2px solid white;">
+  <div class="q-pa-md" style="height: 100vh; display: flex; flex-direction: column; align-items: center; margin-top: -1%;">
+    <q-card class="my-card text-white" style="min-width: 100%; background-image: linear-gradient( #1989, #3333);">
+      <q-card class="my-card text-white" style="margin-left: 25%; width: 100vh; height: 100vh; background-color: rgba(230, 230, 250, 0.9) ; background-image: linear-gradient( #002222, #002222);">
 
     <q-card-section>
     <div class="text-h5" style="margin: 3%; ">HISTORIA CLINICA</div>
     </q-card-section>
 
 <div v-if="currentStep === 1">
+
  <form id="app" @submit="checkForm" action="https://vuejs.org/" method="post">
   <q-card-section style="margin: 5%; margin-top: -3%;">
       <div class="text-h6">Datos personales</div>
@@ -35,7 +36,6 @@
           </div>
         </div>
       </q-card-section>
-
       <q-card-section style="text-align: center;">
         <div class="q-gutter-md" style="display: flex; flex-wrap: wrap; justify-content: center;">
           <div style="flex: 1; min-width: 200px; margin-right: 10px;">
@@ -85,37 +85,37 @@
     </q-card-section>
 </div>
 
-    <div v-if="currentStep === 2">
+    <div v-if="currentStep === 2" >
       <q-card-section style="margin: 6%; margin-top: -3%;">
         <div class="text-h6">Objetivo</div>
             <div class="q-gutter-md" style="display: flex; margin-top: 1%; flex-wrap: wrap;">
 
               <div style="flex: 1; min-width: 150px; margin-right: 10px;">
-                <q-input rounded filled v-model="ta" label="T.A" :dense="dense"
+                <q-input filled v-model="ta" label="T.A" :dense="dense"
                   color="teal-9" style="border-radius: 5px; background-color: rgba(0, 122, 124);">
                 </q-input>
               </div>
 
               <div style="flex: 1; min-width: 150px; margin-right: 10px;">
-                <q-input rounded filled v-model="fc" label="Fc" :dense="dense"
+                <q-input filled v-model="fc" label="Fc" :dense="dense"
                   color="teal-9" style="border-radius: 5px; background-color: rgba(0, 122, 124);">
                 </q-input>
               </div>
 
               <div style="flex: 1; min-width: 150px; margin-right: 10px;">
-                <q-input rounded filled v-model="fr" label="Fr" :dense="dense"
+                <q-input filled v-model="fr" label="Fr" :dense="dense"
                   color="teal-9" style="border-radius: 5px; background-color: rgba(0, 122, 124);">
                 </q-input>
               </div>
 
               <div style="flex: 1; min-width: 150px; margin-right: 10px;">
-                <q-input rounded filled v-model="t" label="T°" :dense="dense"
+                <q-input filled v-model="t" label="T°" :dense="dense"
                   color="teal-9" style="border-radius: 5px; background-color: rgba(0, 122, 124);">
                 </q-input>
               </div>
 
               <div style="flex: 1; min-width: 150px;">
-                <q-input rounded filled v-model="salt" label="SaltO2" :dense="dense"
+                <q-input filled v-model="salt" label="SaltO2" :dense="dense"
                   color="teal-9" style="border-radius: 5px; background-color: rgba(0, 122, 124);">
                 </q-input>
               </div>
@@ -165,15 +165,6 @@
                     style="border-radius: 5px; background-color: rgba(0, 122, 124, 0.7); margin-top: 10%;"
                 />
             </div>
-            <div style="margin-left: 200px;">
-                <q-uploader
-                    url="http://localhost:4444/upload"
-                    color="teal"
-                    flat
-                    bordered
-                    style="max-width: 300px; "
-                />
-            </div>
         </q-card-section>
 
         <div v-if="firmaUrl">
@@ -200,6 +191,7 @@
       color='transparent'
       icon="arrow_forward"
       class="ripple-effect large-btn"
+       style="color: black;"
     />
     <q-btn
       v-if='currentStep === totalSteps'
@@ -280,7 +272,7 @@ const planterapeutico = ref('')
 const medico = ref('')
 const fechaRegistro = ref('')
 const dense = ref(false)
-const isAdult = computed(() => age.value <= 18)
+const isAdult = computed(() => age.value <= 17)
 const nameError = ref(false)
 const surnameError = ref(false)
 const ageError = ref(false)
@@ -348,6 +340,9 @@ const checkForm = () => {
   return isValid
 }
 
+import { useQuasar } from 'quasar' // Importar useQuasar
+const $q = useQuasar() // Obtener la instancia de Quasar
+
 const guardar = async () => {
   const idCardRef = doc(firestore, 'DatosPersonales', idCard.value)
 
@@ -399,6 +394,16 @@ const guardar = async () => {
 
     console.log('Datos guardados correctamente')
 
+    // Calcular la fecha de vencimiento (10 años después)
+    const fechaRegistro = new Date() // Fecha actual
+    const fechaVencimiento = new Date(fechaRegistro)
+    fechaVencimiento.setFullYear(fechaVencimiento.getFullYear() + 10) // Sumar 10 años
+
+    $q.notify({
+      type: 'positive',
+      message: `Registro Exitoso, se vencerá el ${fechaVencimiento.toLocaleDateString()}.`
+    })
+
     agregarNotificacion(`${medico.value} creó una historia médica del paciente ${name.value} ${surname.value} el `)
 
     const auth = getAuth()
@@ -406,12 +411,8 @@ const guardar = async () => {
 
     if (user) {
       const userDocRef = doc(firestore, 'usersColecction', user.email)
-      const mensaje = `creó una historia médica del paciente ${name.value} ${surname.value} el ${formatDate(new Date())}`
-
-      // Reference to the 'actividad' subcollection
+      const mensaje = `Creó una historia médica del paciente ${name.value} ${surname.value} el ${formatDate(new Date())}`
       const actividadCollectionRef = collection(userDocRef, 'actividad')
-
-      // Add the new message to the 'actividad' subcollection
       try {
         await addDoc(actividadCollectionRef, { mensaje })
         console.log('Mensaje guardado en la subcolección actividad.')
@@ -454,8 +455,12 @@ const formatDate = (date) => {
 const message = ref('')
 
 const isValid = ref(true)
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const saveuno = async () => {
+  message.value = ''
   isValid.value = checkForm()
   if (!isValid.value) {
     message.value = 'Los campos no están correctamente llenados'
@@ -466,6 +471,7 @@ const saveuno = async () => {
     message.value = 'Registro exitoso'
     isValid.value = true
     await guardar()
+    await router.push('/registros')
   } catch (error) {
     message.value = 'Error al guardar el registro'
     isValid.value = false

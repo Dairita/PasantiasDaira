@@ -1,5 +1,5 @@
 <template>
-  <div class="notification-panel">
+  <div class="q-ma-md notification-panel" style="margin-left: 5%;">
     <div class="text-h6">Notificaciones</div>
 
     <div class="button-group" style="display: flex; align-items: center;">

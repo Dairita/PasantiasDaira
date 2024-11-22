@@ -1,12 +1,53 @@
 <template>
   <div class="q-pa-md" style="height: 100vh; display: flex; flex-direction: column; align-items: center; margin-top: 5%;">
+
+    <q-dialog v-model="persistent" persistent transition-show="scale" transition-hide="scale">
+      <q-card class="black patients.idCard-white" style="width: 3000px">
+        <q-card-section>
+          <div class="patients.idCard-h6">Acceso a historia medica</div>
+        </q-card-section>
+
+        <q-card-section class="q-pa-md" style="margin-left: 20%;" >
+          <p>ingresa tu contraseña</p>
+          <q-input
+          v-model="pass"
+          :class="{'error-input': passError}"
+          filled
+          :type="isPwd ? 'password' : 'text'"
+          label="Contraseña"
+          :dense="dense"
+          style="width: 50%; margin-left: 10%; background-color: #1e1e2f; border-radius: 16px; color: white;"
+        >
+          <template v-slot:append>
+            <q-icon
+              :name="isPwd ? 'visibility_off' : 'visibility'"
+              @click="isPwd = !isPwd"
+              style="cursor: pointer;"
+            />
+          </template>
+
+        </q-input>
+        <div v-if="passError" class="error-message">La contraseña es incorrecta.</div>
+        </q-card-section>
+        <q-card-actions align="right" class="q-pa-md">
+          <q-btn @click="acceder(selectedRow)" icon="search" color="teal-9"/>
+        </q-card-actions>
+        <q-inner-loading
+          :showing="visible"
+          label="Please wait..."
+          label-class="text-teal"
+          label-style="font-size: 1.1em"
+        />
+      </q-card>
+    </q-dialog>
+
       <q-table
         v-model:pagination="pagination"
         :rows="filteredRecords"
         :columns="columns"
         row-key="cedula"
-        class="row"
-        style="background-color: rgba(230, 230, 250, 0.0); border: 20px; width: 100%; height: 90%; margin-top: -5%; background-image: linear-gradient( #1989, #3333);"
+        class="custom-table"
+        style="background-color: rgba(220, 250, 250, 0.9); border: 20px; width: 100%; height: 90%; margin-top: -5%; background-image: linear-gradient( #1989, #3333);"
         :rows-per-page-options="[11]"
       >
         <template v-slot:top>
@@ -35,13 +76,10 @@
         </template>
     </q-table>
 
-<q-dialog v-model="showPopup" persistent>
-  <q-card class="custom-dialog" style="background-color: #007A7C; border: 1px solid #FFFFFF; border-radius: 50px;">
-    <q-btn @click="salir" icon="cancel" color="red" round style="margin-left: 100%; margin-top: -5%;"/>
-        <q-card class="my-card bg-white text-black" style="margin-bottom: 1%; margin-top: -5%; border-radius: 50px; border: 2px solid #007A7C;">
-          <div class="row justify-content-start align-items-center" style="margin-top: 5%;">
+<q-dialog v-model="showPopup" >
+  <q-card class="custom-dialog" style="background-color: #002222; border: 1px solid #FFFFFF;  border-radius: 5px;">
+          <div class="row" style="margin-top: 5%;">
             <img alt="Quasar logo" src="~src/assets/images-removebg-preview.png" style="max-width: 1300px; max-height: 1300px; margin-right: 20px; margin-left: 5%;"/>
-
             <div style="margin-top: 5%;">
             <div style="text-align: left;">
               <h5 style="margin: 10px 0 0 0; color: #4CAF50; font-weight: bold;">Fundación</h5>
@@ -224,25 +262,15 @@
 
           <q-card-section style="display: flex; flex-direction: column; align-items: center;">
             <div style="display: flex; justify-content: center; align-items: center;">
-              <q-input v-model="medico" readonly label="Medico" :dense="dense" style=" background-color: rgba(0, 122, 124, 0.7); "/>
-
-               <q-file color="teal-9" filled v-model="model" label="Firma" style=" background-color: rgba(0, 122, 124, 0.7); ">
-               <template v-slot:prepend>
-                 <q-icon name="cloud_upload" />
-               </template>
-               </q-file>
+              <q-input v-model="medico" readonly label="Medico" :dense="dense" style=" background-color: rgba(0, 122, 124, 0.7); margin-right: 5%; "/>
               <q-input v-model="fechaRegistro" readonly mask="##/##/####" label="Fecha" style=" background-color: rgba(0, 122, 124, 0.7); "/>
               </div>
           </q-card-section>
-
         </q-card>
-      </q-card>
 </q-dialog>
 
-<q-dialog v-model="showBtn" persistent >
-  <q-card class="custom-dialog" style="background-color: #007A7C; border: 1px solid #FFFFFF;  border-radius: 50px;">
-    <q-card class="my-card bg-gray text-white" style="margin-top: 20px;">
-      <q-btn @click="atras" icon="cancel" color="red" round style="margin-left: 100%; margin-top: -5%;"/>
+<q-dialog v-model="showBtn" >
+  <q-card class="custom-dialog" style="background-color: #002222; border: 1px solid #FFFFFF;  border-radius: 5px;">
       <q-card-section>
         <div class="text-h6">EVOLUCION</div>
       </q-card-section>
@@ -288,29 +316,20 @@
           <q-card-section style="display: flex; flex-direction: column; align-items: center;">
           <div style="display: flex; justify-content: center; align-items: center;">
            <q-input v-model="medicoEEV"  label="Medico" style="max-width: 150px; margin: 0 5px;" />
-           <q-file color="teal" filled v-model="model" label="Firma" style="max-width: 150px; margin: 0 5px;">
-           <template v-slot:prepend>
-           <q-icon name="cloud_upload" />
-           </template>
-          </q-file>
           <q-input v-model="fechaEV" readonly mask="##/##/####" label="Fecha" style="max-width: 150px; margin: 0 5px;" />
           </div>
           </q-card-section>
         </q-card-section>
-
         <q-card-section style="display: flex; flex-direction: column; align-items: center;">
          <q-btn color="teal" @click="save" icon="save_as"/>
-
         </q-card-section>
     </q-card-section>
    </q-card>
-  </q-card>
+
 </q-dialog>
 
-<q-dialog v-model="showform" persistent>
-    <q-card class="custom-dialog" style="background-color: #007A7C; border: 1px solid #FFFFFF;  border-radius: 50px;">
-      <q-btn @click="patras" icon="cancel" color="red" round style="margin-left: 100%; margin-top: -5%;"/>
-
+<q-dialog v-model="showform" >
+    <q-card class="custom-dialog" style="background-color: #002222; border: 1px solid #FFFFFF">
         <q-card-section>
           <div class="text-h6">EVOLUCION</div>
         </q-card-section>
@@ -357,11 +376,6 @@
             <q-card-section style="display: flex; flex-direction: column; align-items: center;">
             <div style="display: flex; justify-content: center; align-items: center;">
              <q-input v-model="medico" readonly label="Medico" style="max-width: 150px; margin: 0 5px;" />
-             <q-file color="teal" filled v-model="model" label="Firma" style="max-width: 150px; margin: 0 5px;">
-             <template v-slot:prepend>
-             <q-icon name="cloud_upload" />
-             </template>
-            </q-file>
             <q-input v-model="fecha" readonly mask="##/##/####" label="Fecha" style="max-width: 150px; margin: 0 5px;" />
             </div>
             </q-card-section>
@@ -381,18 +395,47 @@ import { ref, onMounted, computed } from 'vue'
 import { doc, setDoc, collection, getDocs, getDoc, addDoc } from 'firebase/firestore'
 import { firestore, db } from 'boot/firebase'
 import { useRoute } from 'vue-router'
-import { getAuth } from 'firebase/auth'
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 
 const route = useRoute()
-
 const showPopup = ref(false)
+const isPwd = ref(true)
 const showBtn = ref(false)
 const showform = ref(false)
-
 const filteredRecords = ref([])
-
 const showPage1 = ref(true)
 const showPage2 = ref(true)
+const pass = ref('')
+const passError = ref('')
+const visible = ref(false)
+const persistent = ref(false)
+
+onMounted(() => {
+  persistent.value = true
+})
+
+const auth = getAuth()
+const acceder = async () => {
+  const userEmail = auth.currentUser?.email
+
+  if (!userEmail) {
+    console.error('No hay un usuario autenticado.')
+    return
+  }
+  visible.value = true
+
+  try {
+    await signInWithEmailAndPassword(auth, userEmail, pass.value)
+    persistent.value = false
+    passError.value = false
+  } catch (error) {
+    console.error('Error de autenticación:', error.message)
+    passError.value = true
+  } finally {
+    visible.value = false
+    agregarNotificacion(`${userEmail} consulto la historia medica del paciente ${name.value} ${surname.value} el `)
+  }
+}
 
 const handleClick = () => {
   const printWindow = window.open('', '_blank')
@@ -580,7 +623,6 @@ const ver = (data) => {
   plant.value = data.plant || ''
   medicoE.value = data.medicoE || ''
   fecha.value = data.fecha || ''
-
   showform.value = true
 }
 
@@ -644,10 +686,10 @@ const loadMaxInterconsulta = async (userDocRef) => {
   const interconsultas = querySnapshot.docs.map(doc => parseInt(doc.data().Interconsulta.replace('#', '')))
 
   if (interconsultas.length > 0) {
-    currentInterconsulta.value = Math.max(...interconsultas) + 1 // Establecer el siguiente número
+    currentInterconsulta.value = Math.max(...interconsultas) + 1
   }
 
-  InterconsultaEV.value = `#${currentInterconsulta.value}` // Actualizar el valor de Interconsulta
+  InterconsultaEV.value = `#${currentInterconsulta.value}`
 }
 
 const getEvoluciones = async (userDocRef) => {
@@ -666,6 +708,9 @@ const getEvoluciones = async (userDocRef) => {
 import useNotificaciones from 'boot/useNotificaciones'
 
 const { agregarNotificacion } = useNotificaciones()
+
+import { useQuasar } from 'quasar'
+const $q = useQuasar()
 
 async function save () {
   try {
@@ -692,19 +737,27 @@ async function save () {
     currentInterconsulta.value += 1
     InterconsultaEV.value = `#${currentInterconsulta.value}`
 
-    agregarNotificacion(`${medicoEEV.value} añadio una evolucion del paciente ${name.value} ${surname.value} el.`)
+    // Calcular la fecha de vencimiento (10 años después)
+    const fecha = new Date() // Fecha actual
+    const fechaVencimiento = new Date(fecha)
+    fechaVencimiento.setFullYear(fechaVencimiento.getFullYear() + 10)
+
+    $q.notify({
+      type: 'positive',
+      message: `Registro Exitoso de interconsulta, se vencerá el ${fechaVencimiento.toLocaleDateString()}.`
+    })
+
+    agregarNotificacion(`${medicoEEV.value} añadió una evolucion del paciente ${name.value} ${surname.value} el.`)
 
     const auth = getAuth()
     const user = auth.currentUser
 
     if (user) {
       const userDocRef = doc(firestore, 'usersColecction', user.email)
-      const mensaje = `añadio una evolucion del paciente ${name.value} ${surname.value} el ${formatDate(new Date())}`
+      const mensaje = `Añadió una interconsulta del paciente ${name.value} ${surname.value} el ${formatDate(new Date())}`
 
-      // Reference to the 'actividad' subcollection
       const actividadCollectionRef = collection(userDocRef, 'actividad')
 
-      // Add the new message to the 'actividad' subcollection
       try {
         await addDoc(actividadCollectionRef, { mensaje })
         console.log('Mensaje guardado en la subcolección actividad.')
@@ -714,10 +767,12 @@ async function save () {
     }
 
     limpiarCampos()
+    showBtn.value = false
   } catch (error) {
     console.error('Error al guardar evolución:', error)
   }
 }
+
 const formatDate = (date) => {
   const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true }
   const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date)
@@ -726,13 +781,14 @@ const formatDate = (date) => {
 const setFechaActual = () => {
   const hoy = new Date()
   const dia = String(hoy.getDate()).padStart(2, '0')
-  const mes = String(hoy.getMonth() + 1).padStart(2, '0') // Los meses son base cero
+  const mes = String(hoy.getMonth() + 1).padStart(2, '0')
   const año = hoy.getFullYear()
 
   fechaEV.value = `${dia}/${mes}/${año}`
 }
 
 onMounted(async () => {
+  persistent.value = true
   setFechaActual()
   const auth = getAuth()
   const user = auth.currentUser
@@ -763,17 +819,6 @@ function limpiarCampos () {
   plantEV.value = ''
 }
 
-const salir = () => {
-  showPopup.value = false
-}
-
-const atras = () => {
-  showBtn.value = false
-}
-const patras = () => {
-  showform.value = false
-}
-
 const getRecords = async () => {
   const querySnapshot = await getDocs(collection(firestore, 'Evolucion'))
   evolucionn.value = querySnapshot.docs.map(doc => doc.data())
@@ -790,7 +835,7 @@ onMounted(() => {
 
 <style scoped>
 .custom-btn {
-  background-color: rgba(73, 164, 170);
+  background-color: rgb(26, 135, 143);
   width: 20%;
   padding: 10px;
   border-radius: 80px;
@@ -807,8 +852,33 @@ onMounted(() => {
 }
 .custom-dialog {
   max-width:1000%;
-  padding: 50px;
-  border-radius: 10px;
+  max-height: 100%;
+  padding: 3px;
+  overflow-y: auto; /* Habilitar el desplazamiento vertical */
+}
+
+/* Estilos de la barra de desplazamiento */
+.custom-dialog::-webkit-scrollbar {
+  width: 8px; /* Ancho de la barra de desplazamiento */
+}
+
+.custom-dialog::-webkit-scrollbar-track {
+  background: #002222; /* Fondo de la pista de la barra de desplazamiento */
+}
+
+.custom-dialog::-webkit-scrollbar-thumb {
+  background-color: #4CAF50; /* Color del pulgar de la barra de desplazamiento */
+  border-radius: 10px; /* Esquinas redondeadas para el pulgar */
+}
+
+.custom-dialog::-webkit-scrollbar-thumb:hover {
+  background-color: #45a049; /* Sombra más oscura al pasar el ratón */
+}
+
+/* Para Firefox */
+.custom-dialog {
+  scrollbar-width: thin;
+  scrollbar-color: #4CAF50 #002222; /* Color del pulgar y color de la pista */
 }
 
 .btn-image {
@@ -824,9 +894,14 @@ onMounted(() => {
   margin-bottom: -5%;
 }
 
-@media (max-width: 600px) {
-  body {
-    font-size: 1.2em; /* Aumentar el tamaño de fuente en pantallas pequeñas */
-  }
+.custom-table {
+  color: black; /* Set text color to black */
+  font-size: 1.9em; /* Increase font size */
 }
+
+.error-message {
+  color: red; /* Color del mensaje de error */
+  margin-top: 5px; /* Espaciado superior para el mensaje */
+}
+
 </style>

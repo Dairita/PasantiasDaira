@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-md">
-    <q-toolbar class="bg-teal-5 text-white">
+    <q-toolbar class="bg-teal-8 text-white">
       <q-btn flat round dense icon="assignment_ind" @click="showSection('unconfirmed')">
         <q-badge floating color="red">{{ unconfirmedUsers.length }}</q-badge>
       </q-btn>
@@ -11,16 +11,13 @@
       <q-btn flat round dense icon="add_circle" class="q-mr-xs" @click="showSection('form')"/>
     </q-toolbar>
 
-    <form style="padding: 50px; text-align: center; min-width: 50%; background-image: linear-gradient( #1989,#3333);">
+    <form style="padding: 50px; text-align: center; min-width: 50%; background-image: linear-gradient(to bottom,  rgba(0, 150, 136, 0.8), rgba(255, 255, 255, 0.1));">
     <form @submit.prevent="updateUser" class="centered-form" >
       <div style="margin-top: 7%;">
         <div class="q-gutter-md" style="margin-left: 3px;">
           <q-card-section style="padding: 1%; margin-top: 5%;">
             <h3 style="margin-top: -5%; font-weight: bold; font-family: 'Arial', sans-serif;">
               Usuarios
-              <q-btn flat round style="height: 50px; width: 50px;">
-                <q-icon name="supervisor_account" size="50px" color="teal-10" style="margin-top: -10%; margin-right: 50%;"/>
-            </q-btn>
             </h3>
 
             <div v-if="currentSection === 'unconfirmed'">
@@ -48,10 +45,10 @@
                 <q-card-section>
                   <div><strong>Nombre:</strong> {{ user.username }}</div>
                   <div><strong>Email:</strong> {{ user.email }}</div>
-                  <div><strong>Rol:</strong> {{ user.role }}</div>
                   <div><strong>Fecha de creación:</strong> {{ user.fechaCreacion }}</div>
                   <div><strong>Ultima hora de ingreso:</strong> {{ user.horaIngreso }}</div>
                   <div><strong>Ultima hora de salida:</strong> {{ user.horaSalida }}</div>
+                  <div><strong>Rol:</strong> {{ user.role }}</div>
                   <div>
                     <strong>Cuenta: </strong>
                     <span>{{ user.confirmed ? 'Activa' : 'Inactiva' }}</span>
@@ -61,6 +58,7 @@
                       :color="user.confirmed ? 'green' : 'red'"
                     />
                   </div>
+
                   <q-btn color="teal-9" label="Actividad del Usuario" @click="mostrarDialogo(user)" />
                </q-card-section>
               </q-card>
@@ -118,10 +116,10 @@
                   <q-card-section>
                     <div><strong>Nombre:</strong> {{ user.username }}</div>
                     <div><strong>Email:</strong> {{ user.email }}</div>
-                    <div><strong>Rol:</strong> {{ user.role }}</div>
                     <div><strong>Fecha de creación:</strong> {{ user.fechaCreacion }}</div>
                     <div><strong>Ultima hora de ingreso:</strong> {{ user.horaIngreso }}</div>
                     <div><strong>Ultima hora de salida:</strong> {{ user.horaSalida }}</div>
+                    <div><strong>Rol:</strong> {{ user.role }}</div>
                     <div>
                       <strong>Cuenta: </strong>
                       <span>{{ user.confirmed ? 'Activa' : 'Inactiva' }}</span>
@@ -388,7 +386,7 @@ const updateConfirmed = async (user) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: rgb(19, 94, 105); /* Fondo blanco para cada fila */
+  background-color: rgb(28, 119, 134); /* Fondo blanco para cada fila */
   box-shadow: 0px 2px 5px rgba(21, 8, 139, 0.5); /* Sombra gris claro */
 }
 
