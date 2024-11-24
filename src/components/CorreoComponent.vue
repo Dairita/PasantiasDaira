@@ -1,7 +1,8 @@
 <template>
   <q-card class="my-card" style="width: 300px ">
+    <img alt="Quasar logo" src="~assets/images-removebg-preview.png" style="max-height: 150px; max-width: 150px; margin-top: -30%; margin-bottom: 2%; margin-left: 20%;"/>
     <q-card-section>
-      <div class="text-h6">Ingresa tu email</div>
+      <div class="text-h6" style="margin-left: 15%;">INGRESA TU EMAIL</div>
       <q-input
         v-model="emailAddress"
         type="email"
@@ -10,9 +11,10 @@
       />
     </q-card-section>
     <q-card-actions>
-      <q-btn @click="recoverPass" label="Enviar" color="green" />
+      <q-btn @click="recoverPass" label="Enviar" icon="mail" color="green" style="margin-left: 30%; margin-bottom: 10%;"/>
     </q-card-actions>
   </q-card>
+
 </template>
 
 <script setup>

@@ -1,5 +1,7 @@
 <template>
+
     <q-card class="login slide-in">
+
       <img alt="Quasar logo" src="~assets/images-removebg-preview.png" style="max-height: 150px; max-width: 150px; margin-top: -30%; margin-bottom: 20%; margin-left: 15%;"/>
       <q-input v-model="email" type="email" filled label="Email" style="min-width: 120%; margin-left: 10px; margin-left: -8%; background-color: #1e1e2f; border-radius: 16px; color: white; margin-bottom: 10%;"/>
       <q-input
@@ -34,6 +36,7 @@
         label-style="font-size: 1.1em"
       />
     </q-card>
+
   </template>
 
 <script setup>

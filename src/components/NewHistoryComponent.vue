@@ -1,7 +1,7 @@
 <template>
   <div class="q-pa-md" style="height: 100vh; display: flex; flex-direction: column; align-items: center; margin-top: -1%;">
-    <q-card class="my-card text-white" style="min-width: 100%; background-image: linear-gradient( #1989, #3333);">
-      <q-card class="my-card text-white" style="margin-left: 25%; width: 100vh; height: 100vh; background-color: rgba(230, 230, 250, 0.9) ; background-image: linear-gradient( #002222, #002222);">
+    <q-card class="my-card text-white" style="min-width: 100%; background-image: linear-gradient(#1989, #3333);">
+      <q-card class="my-card text-white" style="margin-left: 25%; width: 100vh; height: 100vh; background-image: linear-gradient(#002222, #002222); border: 50px rgba(0, 34, 34, 0.9); box-shadow: 0 0 50px rgba(0, 34, 34, 2.9);">
 
     <q-card-section>
     <div class="text-h5" style="margin: 3%; ">HISTORIA CLINICA</div>
@@ -249,6 +249,11 @@ onMounted(async () => {
   }
 })
 
+const onDateSelected = (date) => {
+  birthDate.value = date
+  showDatePicker.value = false
+}
+
 const currentStep = ref(1)
 const totalSteps = ref(3)
 const name = ref('')
@@ -300,11 +305,6 @@ const formattedDate = computed(() => {
   const dateParts = birthDate.value.split('-')
   return `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`
 })
-
-function onDateSelected (date) {
-  birthDate.value = date
-  showDatePicker.value = false
-}
 
 const validateBirthDate = () => {
   return !!birthDate.value
@@ -575,4 +575,5 @@ const setFechaActual = () => {
   'GRAD' 0,
   'opsz' 24
 }
+
 </style>

@@ -3,7 +3,7 @@
     <div style="position: relative; display: flex;">
       <q-img
         src="src/assets/Hospital-Adventista.jpg"
-        style="max-width: 2000px; max-height: 958px;">
+        style="max-width: 2000px; max-height: 100vh;">
       </q-img>
       <div class="centered-rectangle" style="margin-left: 4%;">
         <CuentaComponent/>

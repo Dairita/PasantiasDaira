@@ -36,7 +36,7 @@
     <q-dialog v-model="persistent" transition-show="scale" transition-hide="scale">
       <q-card class="black patients.idCard-white" style="width: 400px">
         <q-card-section>
-          <div class="patients.idCard-h6">Historia Medica</div>
+          <div class="patients.idCard-h6">Acceso a historia medica {{ selectedRow ? selectedRow.name : '' }}</div>
           <q-card-section style="margin-left: 10%;">
             <q-btn @click="acceder(selectedRow)" label="Acceso a historia medica" icon="search" color="teal-9"/>
           </q-card-section>

@@ -11,7 +11,7 @@
       <q-btn flat round dense icon="add_circle" class="q-mr-xs" @click="showSection('form')"/>
     </q-toolbar>
 
-    <form style="padding: 50px; text-align: center; min-width: 50%; background-image: linear-gradient(to bottom,  rgba(0, 150, 136, 0.8), rgba(255, 255, 255, 0.1));">
+    <div style="padding: 50px; text-align: center; min-width: 50%; background-image: linear-gradient(to bottom,  rgba(0, 150, 136, 0.8), rgba(255, 255, 255, 0.1));">
     <form @submit.prevent="updateUser" class="centered-form" >
       <div style="margin-top: 7%;">
         <div class="q-gutter-md" style="margin-left: 3px;">
@@ -195,7 +195,7 @@
         </div>
       </div>
     </form>
-  </form>
+  </div>
   </div>
 </template>
 
