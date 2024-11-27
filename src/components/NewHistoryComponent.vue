@@ -349,7 +349,10 @@ const guardar = async () => {
   const idCardDoc = await getDoc(idCardRef)
 
   if (idCardDoc.exists()) {
-    alert('La cédula ya está registrada. Por favor revise los registros.')
+    $q.notify({
+      type: 'negative',
+      message: 'Esta cedula pertenece a un paciente'
+    })
     return
   }
 
@@ -367,7 +370,6 @@ const guardar = async () => {
       usuarioregistro: medico.value
     })
 
-    // Guardar en MotivosConsulta
     const motivo = doc(firestore, 'MotivosConsulta', idCard.value)
     await setDoc(motivo, {
       idCard: idCard.value,
@@ -394,7 +396,6 @@ const guardar = async () => {
 
     console.log('Datos guardados correctamente')
 
-    // Calcular la fecha de vencimiento (10 años después)
     const fechaRegistro = new Date() // Fecha actual
     const fechaVencimiento = new Date(fechaRegistro)
     fechaVencimiento.setFullYear(fechaVencimiento.getFullYear() + 10) // Sumar 10 años
@@ -462,12 +463,25 @@ const router = useRouter()
 const saveuno = async () => {
   message.value = ''
   isValid.value = checkForm()
+
   if (!isValid.value) {
     message.value = 'Los campos no están correctamente llenados'
+    currentStep.value = 1
     return
   }
 
   try {
+    const idCardRef = doc(firestore, 'DatosPersonales', idCard.value)
+    const idCardDoc = await getDoc(idCardRef)
+    if (idCardDoc.exists()) {
+      $q.notify({
+        type: 'negative',
+        message: 'La cedula ya esta en uso'
+      })
+      currentStep.value = 1
+      return
+    }
+
     message.value = 'Registro exitoso'
     isValid.value = true
     await guardar()
