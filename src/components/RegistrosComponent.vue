@@ -17,7 +17,7 @@
         <q-toolbar>
           <q-toolbar-title style="font-size: 1.9em; font-weight: bold;">Registros Médicos</q-toolbar-title>
           <div style="display: flex; align-items: center;">
-            <q-input standout v-model="text" label="Buscar Cédula" mask="##.###.###" style="border-radius: 5px; background-color: rgba(3, 122, 124, 0.7);"/>
+            <q-input standout v-model="text" label="Buscar Cédula" mask="V- ##.###.### -#" style="border-radius: 5px; background-color: rgba(3, 122, 124, 0.7);"/>
             <q-btn @click="exportToExcel" class="q-mb-md" color="red" style="margin-top: 5%; width: 40px; height: 40px; margin-left: 5%; display: flex; align-items: center; justify-content: center; padding: 20px;">
               <q-icon name="view_list" size="24px" class="zoom-icon" />
             </q-btn>
@@ -31,8 +31,8 @@
           <q-btn @click="deleteRecord(props.row.idCard)" icon="delete" v-if="isDeleteButtonVisible(props.row.fechaRegistro, props.row.fecha)" color="negative" style="margin-left: -10px;"/>
         </q-td>
       </template>
+    </q-table>
 
-</q-table>
     <q-dialog v-model="persistent" transition-show="scale" transition-hide="scale">
       <q-card class="black patients.idCard-white" style="width: 400px">
         <q-card-section>
@@ -225,14 +225,10 @@ async function acceder (rowData) {
           medico: combinedData.medico,
           fechaRegistro: combinedData.fechaRegistro,
           analisis: combinedData.analisis,
-          fc: combinedData.fc,
-          fr: combinedData.fr,
           otros: combinedData.otros,
           planterapeutico: combinedData.planterapeutico,
-          salt: combinedData.salt,
-          subjetivo: combinedData.subjetivo,
-          t: combinedData.t,
-          ta: combinedData.ta
+          recipe: combinedData.recipe,
+          subjetivo: combinedData.subjetivo
         }
       })
 

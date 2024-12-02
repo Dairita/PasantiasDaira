@@ -52,7 +52,14 @@ module.exports = {
 
   // add your custom rules here
   rules: {
-
+    'new-cap': [
+      'error',
+      {
+        newIsCap: true,
+        capIsNew: true,
+        newIsCapExceptions: ['jsPDF'] // Permite jsPDF como excepción
+      }
+    ],
     // allow async-await
     'generator-star-spacing': 'off',
     // allow paren-less arrow functions
@@ -74,5 +81,9 @@ module.exports = {
 
     // allow debugger during development only
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+
+
+    // Otras reglas que desees agregar...
+
   }
 }

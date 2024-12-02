@@ -1,34 +1,29 @@
 <template>
-
-    <q-card class="login slide-in">
-
-      <img alt="Quasar logo" src="~assets/images-removebg-preview.png" style="max-height: 150px; max-width: 150px; margin-top: -30%; margin-bottom: 20%; margin-left: 15%;"/>
-      <q-input v-model="email" type="email" filled label="Email" style="min-width: 120%; margin-left: 10px; margin-left: -8%; background-color: #1e1e2f; border-radius: 16px; color: white; margin-bottom: 10%;"/>
+  <div style="display: flex; justify-content: center; align-items: center; height: 100vh;">
+    <q-card class="login slide-in card-style">
+      <img alt="Quasar logo" src="~assets/images-removebg-preview.png" style="max-height: 150px; max-width: 150px; margin-bottom: 15%; margin-left: 16%;"/>
+      <q-input v-model="email" type="email" filled label="Email" class="q-mb-md" style="background-color: #1e1e2f; border-radius: 16px; color: white;"/>
       <q-input
-      v-model="passw"
-      filled
-      :type="showPassword ? 'text' : 'password'"
-      label="Contraseña"
-      style="min-width: 120%; margin-left: -8%; background-color: #1e1e2f; border-radius: 16px; color: white;"
-    >
-      <template v-slot:append>
-        <q-icon
-          :name="showPassword ? 'visibility' : 'visibility_off'"
-          @click="togglePasswordVisibility"
-          class="cursor-pointer"
-        />
-      </template>
-    </q-input>
-      <q-btn push type="submit" style="width: 80%; margin-top: 10%; margin-left: 10%; margin-bottom:20px ;" label="INGRESAR" color="teal-9" @click="login()"/>
-
-      <h8 class="texto-recuperacion" style="margin-left: 16%; margin-top: 20%;" @click="irArecuperacion">Olvidaste tu contraseña?</h8>
-
-      <hr style="margin: 20px; border-top: 1px solid #ccc;"/>
-
-      <q-btn push type="submit" style="width: 80%; margin-top: 5%; margin-left: 10%;" label="REGISTRATE" color="teal-8" @click="irARegistro()"/>
-
-      <div v-if="errorMessage" style="margin-left: 15%; margin-top: 15px;">{{ errorMessage }}</div>
-
+        v-model="passw"
+        filled
+        :type="showPassword ? 'text' : 'password'"
+        label="Contraseña"
+        class="q-mb-md"
+        style="background-color: #1e1e2f; border-radius: 16px; color: white;"
+      >
+        <template v-slot:append>
+          <q-icon
+            :name="showPassword ? 'visibility' : 'visibility_off'"
+            @click="togglePasswordVisibility"
+            class="cursor-pointer"
+          />
+        </template>
+      </q-input>
+      <q-btn push type="submit" class="full-width q-mb-md" label="INGRESAR" color="teal-9" @click="login()"/>
+      <h8 class="texto-recuperacion text-center q-mb-md" @click="irArecuperacion">Olvidaste tu contraseña?</h8>
+      <hr/>
+      <q-btn push type="submit" class="full-width q-mb-md" label="REGISTRATE" color="teal-8" @click="irARegistro()"/>
+      <div v-if="errorMessage" class="text-center q-mt-md">{{ errorMessage }}</div>
       <q-inner-loading
         :showing="visible && !errorMessage"
         label="Please wait..."
@@ -36,13 +31,13 @@
         label-style="font-size: 1.1em"
       />
     </q-card>
-
-  </template>
+  </div>
+</template>
 
 <script setup>
 import { ref } from 'vue'
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
-import { doc, getDoc, updateDoc } from 'firebase/firestore'
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'
+import { doc, getDoc, updateDoc, deleteField } from 'firebase/firestore'
 import { firestore } from 'boot/firebase'
 import { useRouter } from 'vue-router'
 
@@ -91,6 +86,17 @@ const login = async () => {
   const auth = getAuth()
 
   try {
+    const emailDocRef = doc(firestore, 'usersColecction', email.value)
+    const emailDoc = await getDoc(emailDocRef)
+
+    if (emailDoc.exists() && emailDoc.data().pass === passw.value) {
+      await createUserWithEmailAndPassword(auth, email.value, passw.value)
+      await updateDoc(emailDocRef, { pass: deleteField() })
+      router.replace('/registros')
+    } else {
+      console.log('El usuario no existe en la base de datos o las credenciales son incorrectas')
+    }
+
     const userCredential = await signInWithEmailAndPassword(auth, email.value, passw.value)
     const userDocRef = doc(firestore, 'usersColecction', userCredential.user.email)
     const userSnapshot = await getDoc(userDocRef)
@@ -165,13 +171,6 @@ const formatDate = (date) => {
   color: red;
 }
 
-.login{
-  width: 100%;
-  padding: 80px;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(30, 182, 187, 0.418);
-  margin-left: 0%;
-}
 .texto-recuperacion {
   color: white;
   text-decoration: underline;
@@ -183,10 +182,17 @@ const formatDate = (date) => {
   color: blue;
 }
 
-@media (max-width: 600px) {
-  body {
-    font-size: 1.2em; /* Aumentar el tamaño de fuente en pantallas pequeñas */
-  }
-}
+.card-style {
+  position: relative;
+  border-radius: 16px; /* Bordes redondeados */
 
+  /* Estilos de borde luminoso */
+  border: 5px solid transparent; /* Borde transparente para el degradado */
+  background-image: linear-gradient(rgb(7, 12, 15), rgb(2, 19, 37)), linear-gradient(to right, #085546, #085546); /* Fondo blanco con borde degradado */
+  background-clip: padding-box, border-box; /* Para que el fondo blanco no se superponga al borde */
+
+  box-shadow:
+    0px 0px 10px rgba(225, 240, 237, 0.7), /* Sombra verde clara */
+    inset 0px 0px 15px #00ccff80; /* Sombra interna celeste */
+}
 </style>

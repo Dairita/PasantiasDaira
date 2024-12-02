@@ -1,26 +1,53 @@
 <template>
   <div class="q-pa-md">
-    <q-toolbar class="bg-teal-8 text-white">
-      <q-btn flat round dense icon="assignment_ind" @click="showSection('unconfirmed')">
+    <q-toolbar style="background-color: #002222;  color: white; padding: 10px; box-shadow: 0 0 15px rgba(255, 255, 255, 0.8),
+    0 0 30px rgba(255, 255, 255, 0.6); border-radius: 8px;">
+      <div style="font-size: 20px; font-weight: bold; margin-right: auto;">
+        Configuración del Usuario
+      </div>
+      <q-btn
+        flat
+        round
+        dense
+        icon="assignment_ind"
+        @click="showSection('unconfirmed')"
+        style="font-size: 24px; margin-left: 10px;"
+      >
         <q-badge floating color="red">{{ unconfirmedUsers.length }}</q-badge>
       </q-btn>
 
-      <q-toolbar-title>Solicitudes de acceso</q-toolbar-title>
+      <q-btn
+        flat
+        round
+        dense
+        icon="account_circle"
+        class="q-mr-xs"
+        @click="showSection('confirmed')"
+        style="font-size: 24px; margin-left: 10px;"
+      />
 
-      <q-btn flat round dense icon="account_circle" class="q-mr-xs" @click="showSection('confirmed')" />
-      <q-btn flat round dense icon="add_circle" class="q-mr-xs" @click="showSection('form')"/>
+      <q-btn
+        flat
+        round
+        dense
+        icon="add_circle"
+        class="q-mr-xs"
+        @click="showSection('form')"
+        style="font-size: 24px; margin-left: 10px;"
+      />
     </q-toolbar>
 
     <div style="padding: 50px; text-align: center; min-width: 50%; background-image: linear-gradient(to bottom,  rgba(0, 150, 136, 0.8), rgba(255, 255, 255, 0.1));">
     <form @submit.prevent="updateUser" class="centered-form" >
       <div style="margin-top: 7%;">
         <div class="q-gutter-md" style="margin-left: 3px;">
+
           <q-card-section style="padding: 1%; margin-top: 5%;">
-            <h3 style="margin-top: -5%; font-weight: bold; font-family: 'Arial', sans-serif;">
-              Usuarios
-            </h3>
 
             <div v-if="currentSection === 'unconfirmed'">
+              <div style="font-size: 20px; font-weight: bold; margin-right: auto; margin-bottom: 10%">
+                Solicitudes de Acceso
+              </div>
               <div v-if="unconfirmedUsers.length === 0" class="no-requests" style="color: Black; text-align: center; font-size: 1.5em; padding: 10%;">
                 No hay solicitudes en este momento
               </div>
@@ -42,25 +69,70 @@
               </template>
 
               <q-card>
+                <q-card-section style="background-color: #002222; border-radius: 8px; padding: 20px;">
+                  <div style="font-size: 24px; font-weight: bold; color: #007bff;">
+                    <i class="material-icons">person</i> Información del Usuario
+                  </div>
+                  <q-separator/>
+
+                  <q-card-section>
+
+                    <div style="display: flex; align-items: center; margin-top: 10px; font-size: 18px;">
+                      <i class="material-icons" style="vertical-align: middle;">account_circle</i>
+                      <span style="margin-left: 10px;">{{ user.username }}</span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; margin-top: 10px; font-size: 18px;">
+                      <i class="material-icons" style="vertical-align: middle;">email</i>
+                      <span style="margin-left: 10px;">{{ user.email }}</span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; margin-top: 10px; font-size: 18px;">
+                      <i class="material-icons" style="vertical-align: middle;">local_hospital</i> <!-- Medical icon -->
+                      <span style="margin-left: 10px;">
+                        {{ user.role === 'user' ? 'Médico' : user.role }}
+                      </span>
+                    </div>
+
+                  </q-card-section>
+                  <q-separator/>
+                  <q-card-section>
+                    <div style="display: flex; align-items: center; margin-top: 10px; font-size: 18px;">
+                      <span>{{ user.confirmed ? 'ACTIVA' : 'INACTIVA' }}</span>
+                      <q-toggle
+                        v-model="user.confirmed"
+                        @click="updateConfirmed(user)"
+                        :color="user.confirmed ? 'green' : 'red'"
+                        style="margin-left: 10px;"
+                      />
+                    </div>
+                  </q-card-section>
+
+                  <q-separator/>
                 <q-card-section>
-                  <div><strong>Nombre:</strong> {{ user.username }}</div>
-                  <div><strong>Email:</strong> {{ user.email }}</div>
-                  <div><strong>Fecha de creación:</strong> {{ user.fechaCreacion }}</div>
-                  <div><strong>Ultima hora de ingreso:</strong> {{ user.horaIngreso }}</div>
-                  <div><strong>Ultima hora de salida:</strong> {{ user.horaSalida }}</div>
-                  <div><strong>Rol:</strong> {{ user.role }}</div>
-                  <div>
-                    <strong>Cuenta: </strong>
-                    <span>{{ user.confirmed ? 'Activa' : 'Inactiva' }}</span>
-                    <q-toggle
-                      v-model="user.confirmed"
-                      @click="updateConfirmed(user)"
-                      :color="user.confirmed ? 'green' : 'red'"
-                    />
+                  <div style="display: flex; align-items: center; margin-top: 10px; font-size: 18px;">
+                    <i class="material-icons" style="vertical-align: middle; margin-right: 10px">calendar_today</i>
+                    <strong>Fecha de creación:</strong>
+                    <span style="margin-left: 10px;">{{ user.fechaCreacion }}</span>
+
                   </div>
 
-                  <q-btn color="teal-9" label="Actividad del Usuario" @click="mostrarDialogo(user)" />
-               </q-card-section>
+                  <div style="display: flex; align-items: center; margin-top: 10px; font-size: 18px;">
+                    <i class="material-icons" style="vertical-align: middle; margin-right: 10px">access_time</i>
+                    <strong>Última hora de entrada: </strong>
+                    <span style="margin-left: 10px;">{{ user.horaIngreso }}</span>
+
+                  </div>
+
+                  <div style="display: flex; align-items: center; margin-top: 10px; font-size: 18px;">
+                    <i class="material-icons" style="vertical-align: middle; margin-right: 10px">access_time</i>
+                    <strong>Última hora de salida:</strong>
+                    <span style="margin-left: 10px;">{{ user.horaSalida }}</span>
+                  </div>
+                </q-card-section>
+
+                  <q-btn color="teal-9" label="Actividad del Usuario" @click="mostrarDialogo(user)" style="margin-top: 20px;" />
+                </q-card-section>
               </q-card>
               <q-dialog v-model="dialogv">
                 <q-card>
@@ -113,23 +185,69 @@
                     </template>
 
                 <q-card>
-                  <q-card-section>
-                    <div><strong>Nombre:</strong> {{ user.username }}</div>
-                    <div><strong>Email:</strong> {{ user.email }}</div>
-                    <div><strong>Fecha de creación:</strong> {{ user.fechaCreacion }}</div>
-                    <div><strong>Ultima hora de ingreso:</strong> {{ user.horaIngreso }}</div>
-                    <div><strong>Ultima hora de salida:</strong> {{ user.horaSalida }}</div>
-                    <div><strong>Rol:</strong> {{ user.role }}</div>
-                    <div>
-                      <strong>Cuenta: </strong>
-                      <span>{{ user.confirmed ? 'Activa' : 'Inactiva' }}</span>
-                      <q-toggle
-                        v-model="user.confirmed"
-                        @click="updateConfirmed(user)"
-                        :color="user.confirmed ? 'green' : 'red'"
-                      />
+                  <q-card-section style="background-color: #002222; border-radius: 8px; padding: 20px;">
+                    <div style="font-size: 24px; font-weight: bold; color: #007bff;">
+                      <i class="material-icons">person</i> Información del Usuario
                     </div>
-                    <q-btn color="teal-9" label="Actividad del Usuario" @click="mostrarDialogo(user)" />
+                    <q-separator/>
+
+                    <q-card-section>
+
+                      <div style="display: flex; align-items: center; margin-top: 10px; font-size: 18px;">
+                        <i class="material-icons" style="vertical-align: middle;">account_circle</i>
+                        <span style="margin-left: 10px;">{{ user.username }}</span>
+                      </div>
+
+                      <div style="display: flex; align-items: center; margin-top: 10px; font-size: 18px;">
+                        <i class="material-icons" style="vertical-align: middle;">email</i>
+                        <span style="margin-left: 10px;">{{ user.email }}</span>
+                      </div>
+
+                      <div style="display: flex; align-items: center; margin-top: 10px; font-size: 18px;">
+                        <i class="material-icons" style="vertical-align: middle;">local_hospital</i> <!-- Medical icon -->
+                        <span style="margin-left: 10px;">
+                          {{ user.role === 'user' ? 'Médico' : user.role }}
+                        </span>
+                      </div>
+
+                    </q-card-section>
+                    <q-separator/>
+                    <q-card-section>
+                      <div style="display: flex; align-items: center; margin-top: 10px; font-size: 18px;">
+                        <span>{{ user.confirmed ? 'ACTIVA' : 'INACTIVA' }}</span>
+                        <q-toggle
+                          v-model="user.confirmed"
+                          @click="updateConfirmed(user)"
+                          :color="user.confirmed ? 'green' : 'red'"
+                          style="margin-left: 10px;"
+                        />
+                      </div>
+                    </q-card-section>
+
+                    <q-separator/>
+                  <q-card-section>
+                    <div style="display: flex; align-items: center; margin-top: 10px; font-size: 18px;">
+                      <i class="material-icons" style="vertical-align: middle; margin-right: 10px">calendar_today</i>
+                      <strong>Fecha de creación:</strong>
+                      <span style="margin-left: 10px;">{{ user.fechaCreacion }}</span>
+
+                    </div>
+
+                    <div style="display: flex; align-items: center; margin-top: 10px; font-size: 18px;">
+                      <i class="material-icons" style="vertical-align: middle; margin-right: 10px">access_time</i>
+                      <strong>Última hora de entrada: </strong>
+                      <span style="margin-left: 10px;">{{ user.horaIngreso }}</span>
+
+                    </div>
+
+                    <div style="display: flex; align-items: center; margin-top: 10px; font-size: 18px;">
+                      <i class="material-icons" style="vertical-align: middle; margin-right: 10px">access_time</i>
+                      <strong>Última hora de salida:</strong>
+                      <span style="margin-left: 10px;">{{ user.horaSalida }}</span>
+                    </div>
+                  </q-card-section>
+
+                    <q-btn color="teal-9" label="Actividad del Usuario" @click="mostrarDialogo(user)" style="margin-top: 20px;" />
                   </q-card-section>
                 </q-card>
 
@@ -170,7 +288,7 @@
                     <q-input v-model="username" :class="{ 'error-input': usernameError }" filled label="Nombre de usuario"
                       style="margin-bottom: 10px; background-color: #1e1e2f; border-radius: 16px; color: white;" />
 
-                    <q-input v-model="email" :class="{ 'error-input': emailError }" filled label="Email"
+                      <q-input v-model="email" :class="{ 'error-input': emailError }" filled label="Email"
                       style="margin-bottom: 10px; background-color: #1e1e2f; border-radius: 16px; color: white;" />
 
                     <q-input v-model="pass" :class="{ 'error-input': passError }" filled :type="isPwd ? 'password' : 'text'" label="Contraseña"
@@ -203,8 +321,8 @@
 import { ref, onMounted, computed, watch } from 'vue'
 import { collection, getDocs, doc, updateDoc, setDoc, getDoc, getFirestore } from 'firebase/firestore'
 import { firestore } from 'boot/firebase'
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
-import { useRouter } from 'vue-router'
+// import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'
+// import { useRouter } from 'vue-router'
 
 const dialogv = ref(false) // Asegúrate de definir esta variable
 const activities = ref([])
@@ -255,7 +373,7 @@ const cargarUsuarios = async () => {
   }
 }
 
-const router = useRouter()
+// const router = useRouter()
 const dialogVisible = ref(false)
 
 function openDialog (user) {
@@ -306,10 +424,10 @@ const registrar = async () => {
   }
 
   try {
-    const auth = getAuth()
-    const userCredential = await createUserWithEmailAndPassword(auth, email.value, pass.value)
+    // const auth = getAuth()
+    // const userCredential = await createUserWithEmailAndPassword(auth, email.value, pass.value)
 
-    const userDocRef = doc(firestore, 'usersColecction', userCredential.user.email)
+    const userDocRef = (doc(firestore, 'usersColecction', email.value))
 
     const fechaCreacion = new Date()
 
@@ -326,10 +444,11 @@ const registrar = async () => {
 
     await setDoc(userDocRef, {
       username: username.value,
-      email: userCredential.user.email,
+      email: email.value,
       role: 'user',
       confirmed: true,
-      fechaCreacion: formattedDate
+      fechaCreacion: formattedDate,
+      pass: pass.value
 
     })
 
@@ -340,7 +459,8 @@ const registrar = async () => {
     errorMessage.value = ''
 
     alert('Registro exitoso')
-    router.replace('/')
+
+    // router.replace('/')
   } catch (error) {
     console.error('Error al registrar el usuario:', error)
     errorMessage.value = error.message
@@ -386,7 +506,7 @@ const updateConfirmed = async (user) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: rgb(28, 119, 134); /* Fondo blanco para cada fila */
+  background-color: rgb(3, 48, 54); /* Fondo blanco para cada fila */
   box-shadow: 0px 2px 5px rgba(21, 8, 139, 0.5); /* Sombra gris claro */
 }
 
@@ -428,9 +548,16 @@ const updateConfirmed = async (user) => {
 
 .centered-form {
   text-align: center;
-  width: 50%;
+  max-width:60%;
+  max-height:100%;
   margin-top: -20px; /* Add space between the toolbar and the form */
   padding: 50px; /* Optional padding for better appearance */
-  margin-left: 25%;
+  margin-left: 23%;
+  margin-bottom: 30%;
+
+  /* Glowing border effect */
+  border: 2px solid transparent; /* Base border for layout */
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+              0 0 20px rgba(255, 255, 255, 0.6); /* Glowing effect */
 }
 </style>

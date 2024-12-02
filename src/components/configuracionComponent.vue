@@ -34,54 +34,19 @@
             <div style="margin-bottom: -40px;"><h6><strong>Última hora de salida:</strong> {{ user.horaSalida }}</h6></div>
 
           </div>
+
+          <div style="margin-top: 20px;">
+            <q-btn
+              type="button"
+              label="Cambiar contraseña"
+               icon="password"
+              color="teal-9"
+              :loading="isLoading"
+              @click="handleChangePassword"
+              style="width: 50%; margin-left: -7%;"
+            />
+          </div>
         </q-card-section>
-
-      <div class="q-pa-md" style="max-width: 600px; margin-left: 46%; margin-top: -5%; margin-bottom: 5%;">
-        <q-list padding bordered class="rounded-borders">
-          <q-expansion-item
-            dense
-            dense-toggle
-            expand-separator
-            icon="perm_identity"
-            label="Ajustes de la cuenta"
-            class="bg-teal-9 text-white"
-          >
-            <q-card>
-              <q-card-section>
-                <div class="q-gutter-md" style="margin-left: 3px;">
-                  <div style="display: flex; align-items: center; justify-content: center;">
-                    <q-input
-                      v-model="username"
-                      filled
-                      label="Nombre Medico"
-                      :dense="dense"
-                      style="width: 50%; background-color: #1e1e2f; border-radius: 16px; color: white;"
-                    />
-                    <q-btn
-                      type="submit"
-                      color="teal-9"
-                      style="margin-left: 10px;"
-                      icon="badge"
-                    />
-                  </div>
-
-                  <div style="margin-top: 20px;">
-                    <q-btn
-                      type="button"
-                      label="Cambiar contraseña"
-                       icon="password"
-                      color="teal-9"
-                      :loading="isLoading"
-                      @click="handleChangePassword"
-                      style="width: 50%; margin-left: -7%;"
-                    />
-                  </div>
-                </div>
-              </q-card-section>
-            </q-card>
-          </q-expansion-item>
-        </q-list>
-      </div>
 
     </q-card>
     </form>

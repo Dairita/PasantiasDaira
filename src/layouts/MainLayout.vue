@@ -185,13 +185,13 @@ const menuItems = ref([
     icon: 'folder_delete',
     link: '/archivosmuertos',
     role: ['admin']
-  },
-  {
+  }
+  /* {
     title: 'Configuracion',
     icon: 'settings',
     link: '/configuracion',
     role: ['admin', 'user']
-  }
+  } */
 ])
 
 const fetchUserRole = async (email) => {

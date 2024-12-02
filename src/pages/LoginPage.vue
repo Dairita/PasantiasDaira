@@ -1,14 +1,12 @@
 <template>
-  <div style="position: relative;">
+  <div class="login-page">
     <q-img
       src="~assets/Hospital-Adventista.jpg"
-      style="max-width: 2000px; max-height: 100vh;">
+      class="background-image">
     </q-img>
-
-    <div class="centered-rectangle slide-in slideInDown">
+    <div class="login-container">
       <LoginComponent />
     </div>
-
   </div>
 </template>
 
@@ -25,6 +23,11 @@ export default defineComponent({
 </script>
 
 <style>
+.login-page {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
 
 @keyframes slideIn {
   from {
@@ -41,13 +44,35 @@ export default defineComponent({
   animation: slideIn 0.9s ease forwards;
 }
 
-.centered-rectangle {
-  position: absolute;
-  top: 15%;
-  left: 40%;
-  transform: translate(-50%, -50%);
-  background-color: rgba(0, 0, 0, 0.5); /* Cambia a un color negro con 50% de opacidad */
-  padding: 1px 2px;
-  border-radius: 10px;
+.login-page {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.background-image {
+  position: absolute; /* Cambia a absoluto para cubrir todo el contenedor */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Asegura que la imagen cubra todo el área */
+}
+
+.login-container {
+  position: absolute; /* Permite superponer el componente */
+  top: 50%; /* Centra verticalmente */
+  left: 50%; /* Centra horizontalmente */
+  transform: translate(-50%, -50%); /* Ajusta para centrar exactamente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.q-card.login {
+    max-width: inherit; /* Hereda el ancho máximo del contenedor */
+    width: auto; /* Permite que se ajuste automáticamente al contenedor */
+    padding: 60px; /* Espaciado interno para mejorar la apariencia */
 }
 </style>

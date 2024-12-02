@@ -30,7 +30,8 @@ const routes = [
       { path: '/registros', component: () => import('pages/RegistrosPage.vue'), meta: { requiresAuth: true } },
       { path: '/archivosmuertos', component: () => import('pages/ArchivosMuertosPage.vue'), meta: { requiresAuth: true } },
       { path: '/configuracion', component: () => import('pages/ConfiguracionPage.vue'), meta: { requiresAuth: true } },
-      { path: '/notis', component: () => import('pages/notifyPage.vue'), meta: { requiresAuth: true } }
+      { path: '/notis', component: () => import('pages/notifyPage.vue'), meta: { requiresAuth: true } },
+      { path: '/recipe', component: () => import('pages/RecipePage.vue'), meta: { requiresAuth: true } }
     ]
   },
 

@@ -1,6 +1,5 @@
 <template>
   <div class="q-pa-md" style="height: 100vh; display: flex; flex-direction: column; align-items: center; margin-top: 5%;">
-
     <q-dialog v-model="persistent" persistent transition-show="scale" transition-hide="scale">
       <q-card class="black patients.idCard-white" style="width: 3000px">
         <q-card-section>
@@ -71,13 +70,15 @@
         </template>
         <template v-slot:body-cell-actions="props">
           <q-td :props="props">
-            <q-btn @click="ver(props.row)" icon="troubleshoot" color="cyan-9" />
+            <q-btn @click="ver(props.row)" icon="troubleshoot" color="cyan-9" class="q-mr-sm" />
+            <q-btn @click="printRecipeE(props.row)" label="Recipe" icon="receipt_long" color="primary" class="q-mr-sm" />
+            <q-btn @click="printObjectivesE(props.row)" label="Objetivos" icon="file_open" color="secondary" />
           </q-td>
         </template>
-    </q-table>
+      </q-table>
 
 <q-dialog v-model="showPopup" >
-  <q-card class="custom-dialog" style="background-color: #002222; border: 1px solid #FFFFFF;  border-radius: 5px;">
+          <q-card class="custom-dialog" style="background-color: #002222; border: 1px solid #FFFFFF;  border-radius: 5px;">
           <div class="row" style="margin-top: 5%;">
             <img alt="Quasar logo" src="~src/assets/images-removebg-preview.png" style="max-width: 1300px; max-height: 1300px; margin-right: 20px; margin-left: 5%;"/>
             <div style="margin-top: 5%;">
@@ -167,88 +168,32 @@
               </q-input>
               </div>
 
-              <div class="text-h6">Objetivo</div>
-              <div class="q-gutter-md" style="display: flex; margin-top: 1%; flex-wrap: wrap;">
-
-                <div style="flex: 1; min-width: 150px; margin-right: 10px;">
-                  <q-input rounded filled readonly v-model="ta" label="T.A" :dense="dense"
-                    color="teal-9" style=" background-color: rgba(0, 122, 124, 0.7);">
-                  </q-input>
-                </div>
-
-                <div style="flex: 1; min-width: 150px; margin-right: 10px;">
-                  <q-input rounded filled readonly v-model="fc" label="Fc" :dense="dense"
-                    color="teal-9" style=" background-color: rgba(0, 122, 124, 0.7);">
-                  </q-input>
-                </div>
-
-                <div style="flex: 1; min-width: 150px; margin-right: 10px;">
-                  <q-input rounded filled readonly v-model="fr" label="Fr" :dense="dense"
-                    color="teal-9" style=" background-color: rgba(0, 122, 124, 0.7);">
-                  </q-input>
-                </div>
-
-                <div style="flex: 1; min-width: 150px; margin-right: 10px;">
-                  <q-input rounded filled readonly v-model="t" label="T°" :dense="dense"
-                    color="teal-9" style=" background-color: rgba(0, 122, 124, 0.7);">
-                  </q-input>
-                </div>
-
-                <div style="flex: 1; min-width: 150px;">
-                  <q-input rounded filled readonly v-model="salt" label="SaltO2" :dense="dense"
-                    color="teal-9" style=" background-color: rgba(0, 122, 124, 0.7);">
-                  </q-input>
-                </div>
-
-              </div>
-
               <div style="margin-top: 5%;">
-
                 <q-input
                 filled readonly
                 type="textarea"
                 v-model="otros"
-                label="Otros"
+                label="objetivos"
                 rows="10"
                 counter
-                maxlength="5000"
+                maxlength="50000"
                 color="teal-9"
                 style="flex: 1; background-color: rgba(0, 122, 124, 1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 10px; font-size: 15px;"
                 input-style="color: white; line-height: 2; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 50%, transparent 200%); background-size: auto 10px; background-repeat: repeat-y;"
               />
               </div>
         </q-card-section>
-      </q-card-section>
+          </q-card-section>
 
-       <q-card-section style="margin: 3%; margin-top: -3%;">
-        <div class="text-h7">Análisis</div>
-          <q-card-section style="text-align: left;">
-           <div class="q-gutter-md" style="display: flex; flex-wrap: wrap;">
-            <q-input
-            filled readonly
-            type="textarea"
-            v-model="analisis"
-            label="Diagnóstico"
-            rows="10"
-            counter
-            maxlength="5000"
-            color="teal-9"
-            style="flex: 1; background-color: rgba(0, 122, 124, 1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 10px; font-size: 15px;"
-            input-style="color: white; line-height: 2; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 50%, transparent 200%); background-size: auto 10px; background-repeat: repeat-y;"
-          />
-            </div>
-        </q-card-section>
-       </q-card-section>
-
-       <q-card-section style="margin: 3%; margin-top: -3%;">
-          <div class="text-h7">Plan terapéutico</div>
-            <q-card-section style="text-align: left;">
+          <q-card-section style="margin: 3%; margin-top: -3%;">
+            <div class="text-h7">Análisis</div>
+              <q-card-section style="text-align: left;">
               <div class="q-gutter-md" style="display: flex; flex-wrap: wrap;">
                 <q-input
                 filled readonly
                 type="textarea"
-                v-model="planterapeutico"
-                label="Plan terapéutico"
+                v-model="analisis"
+                label="Diagnóstico"
                 rows="10"
                 counter
                 maxlength="5000"
@@ -256,17 +201,58 @@
                 style="flex: 1; background-color: rgba(0, 122, 124, 1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 10px; font-size: 15px;"
                 input-style="color: white; line-height: 2; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 50%, transparent 200%); background-size: auto 10px; background-repeat: repeat-y;"
               />
-          </div>
-               </q-card-section>
-      </q-card-section>
-
-          <q-card-section style="display: flex; flex-direction: column; align-items: center;">
-            <div style="display: flex; justify-content: center; align-items: center;">
-              <q-input v-model="medico" readonly label="Medico" :dense="dense" style=" background-color: rgba(0, 122, 124, 0.7); margin-right: 5%; "/>
-              <q-input v-model="fechaRegistro" readonly mask="##/##/####" label="Fecha" style=" background-color: rgba(0, 122, 124, 0.7); "/>
-              </div>
+                </div>
+            </q-card-section>
           </q-card-section>
-        </q-card>
+
+          <q-card-section style="margin: 3%; margin-top: -3%;">
+              <div class="text-h7">Plan terapéutico</div>
+                <q-card-section style="text-align: left;">
+                  <div class="q-gutter-md" style="display: flex; flex-wrap: wrap;">
+                    <q-input
+                    filled readonly
+                    type="textarea"
+                    v-model="planterapeutico"
+                    label="Plan terapéutico"
+                    rows="10"
+                    counter
+                    maxlength="5000"
+                    color="teal-9"
+                    style="flex: 1; background-color: rgba(0, 122, 124, 1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 10px; font-size: 15px;"
+                    input-style="color: white; line-height: 2; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 50%, transparent 200%); background-size: auto 10px; background-repeat: repeat-y;"
+                  />
+              </div>
+                  </q-card-section>
+
+                  <q-card-section>
+                    <q-input filled readonly type="textarea" v-model="recipe" label="Recipe" rows="5" counter maxlength="5000"
+                    color="teal-9" style="flex: 1; background-color: rgba(0, 122, 124, 1); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); border-radius: 10px; font-size: 15px;"
+                    input-style="color: white; line-height: 2; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 50%, transparent 200%); background-size: auto 10px; background-repeat: repeat-y;"/>
+                  </q-card-section>
+                </q-card-section>
+
+              <q-card-section style="display: flex; flex-direction: column; align-items: center;">
+                <div style="display: flex; justify-content: center; align-items: center;">
+                  <q-input v-model="medico" readonly label="Medico" :dense="dense" style=" background-color: rgba(0, 122, 124, 0.7); margin-right: 5%; "/>
+                  <q-input v-model="fechaRegistro" readonly mask="####/##/##" label="Fecha" style=" background-color: rgba(0, 122, 124, 0.7); "/>
+                  <q-btn @click="printselect" class="q-mb-md custom-btn" color="teal-8" style="width: 60px; height: 60px; margin-left: 5%; display: flex; align-items: center; justify-content: center;">
+                    <q-icon name="list_alt" size="24px" class="zoom-icon" />
+                    </q-btn>
+                  </div>
+              </q-card-section>
+              <q-dialog v-model="dialogprint">
+                <q-card>
+                  <q-card-section>
+                    <div class="text-h6 text-center">Seleccione una opción</div>
+                  </q-card-section>
+                  <q-card-actions align="center">
+                    <q-btn @click="printRecipe" label="Recipe" color="primary" icon="print" class="q-mr-sm" />
+                    <q-btn @click="printObjectives" label="Objetivos" color="secondary" icon="assignment" />
+                  </q-card-actions>
+                </q-card>
+              </q-dialog>
+            </q-card>
+
 </q-dialog>
 
 <q-dialog v-model="showBtn" >
@@ -312,6 +298,11 @@
         <q-input filled type="textarea" v-model="plantEV" label="Otros" rows="5" counter maxlength="5000" style="flex: 1;" />
         </div>
 
+        <div style="margin-top: 5%;">
+          <div class="text-h6">Recipe</div>
+          <q-input filled type="textarea" v-model="recipeEV" label="Otros" rows="5" counter maxlength="5000" style="flex: 1;" />
+          </div>
+
         <q-card-section>
           <q-card-section style="display: flex; flex-direction: column; align-items: center;">
           <div style="display: flex; justify-content: center; align-items: center;">
@@ -354,35 +345,29 @@
 
           <div style="margin-top: 5%;">
           <div class="text-h6">Subjetivo</div>
-          <q-input filled type="textarea" readonly v-model="subjetivos" label="Otros" rows="5" counter maxlength="5000" style="flex: 1;" />
+          <q-input filled type="textarea" readonly v-model="subjetivos" rows="5" counter maxlength="5000" style="flex: 1;" />
           </div>
 
           <div style="margin-top: 5%;">
           <div class="text-h6">Objetivo</div>
-          <q-input filled type="textarea" readonly v-model="objetivo" label="Otros" rows="5" counter maxlength="5000" style="flex: 1;" />
+          <q-input filled type="textarea" readonly v-model="objetivo" rows="5" counter maxlength="5000" style="flex: 1;" />
           </div>
 
           <div style="margin-top: 5%;">
           <div class="text-h6">Analisis o Diagnóstico</div>
-          <q-input filled type="textarea" readonly v-model="analisis" label="Otros" rows="5" counter maxlength="5000" style="flex: 1;" />
+          <q-input filled type="textarea" readonly v-model="analisis" rows="5" counter maxlength="5000" style="flex: 1;" />
           </div>
 
           <div style="margin-top: 5%;">
           <div class="text-h6">Plan terapeutico</div>
-          <q-input filled type="textarea" readonly v-model="plant" label="Otros" rows="5" counter maxlength="5000" style="flex: 1;" />
+          <q-input filled type="textarea" readonly v-model="plant" rows="5" counter maxlength="5000" style="flex: 1;" />
           </div>
 
-          <q-card-section>
-            <q-card-section style="display: flex; flex-direction: column; align-items: center;">
-            <div style="display: flex; justify-content: center; align-items: center;">
-             <q-input v-model="medico" readonly label="Medico" style="max-width: 150px; margin: 0 5px;" />
-            <q-input v-model="fecha" readonly mask="##/##/####" label="Fecha" style="max-width: 150px; margin: 0 5px;" />
-            </div>
-            </q-card-section>
-          </q-card-section>
-
+          <div style="margin-top: 5%;">
+            <div class="text-h6">Recipe</div>
+            <q-input filled type="textarea" v-model="recipes" label="Otros" rows="5" counter maxlength="5000" style="flex: 1;" />
+          </div>
         </q-card-section>
-
   </q-card>
 </q-dialog>
 
@@ -396,7 +381,277 @@ import { doc, setDoc, collection, getDocs, getDoc, addDoc } from 'firebase/fires
 import { firestore, db } from 'boot/firebase'
 import { useRoute } from 'vue-router'
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import jsPDF from 'jspdf'
 
+const printRecipeE = (row) => {
+  const doc = new jsPDF()
+  const logo = 'src/assets/images-removebg-preview.png' // Path to your logo
+  const img = new Image()
+
+  img.onload = function () {
+    doc.addImage(img, 'PNG', 10, 10, 50, 50) // Adjust size as needed
+    let yPosition = 25
+    const lineSpacing = 5
+
+    doc.setFontSize(14) // Reduced font size
+    doc.setTextColor(0, 128, 128) // Teal color for Hospital name
+    doc.text('Fundación', 70, yPosition)
+    yPosition += 4 + lineSpacing // Move down for next line (font size + spacing)
+
+    // Title: Hospital Adventista de Venezuela
+    doc.setFontSize(16)
+    doc.text('Hospital Adventista de Venezuela', 70, yPosition)
+    yPosition += 6 + lineSpacing
+
+    doc.setFontSize(12)
+    doc.setTextColor(0, 128, 128)
+    doc.text('Rif J-08517758-2', 70, yPosition)
+    const pacienteDetails = `Receta para: ${name.value} ${surname.value} ${recipes.value}`
+    const recipeDetails = `Recipe: ${recipes.value} ${row.recipes}`
+
+    const pacienteTextLines = doc.splitTextToSize(pacienteDetails, 190)
+    const recipeTextLines = doc.splitTextToSize(recipeDetails, 190)
+
+    yPosition += 12 + lineSpacing
+    pacienteTextLines.forEach((line) => {
+      doc.text(line, 10, yPosition)
+      yPosition += 14 + lineSpacing
+    })
+
+    recipeTextLines.forEach((line) => {
+      doc.text(line, 10, yPosition)
+      yPosition += 1 + lineSpacing
+    })
+
+    const medicoDetails = `Recipe: ${fechaRegistro.value} firma: ______________`
+    const medicoTextLines = doc.splitTextToSize(medicoDetails, 300)
+    yPosition += 12 + lineSpacing
+
+    medicoTextLines.forEach((line) => {
+      doc.text(line, 10, yPosition)
+      yPosition += 14 + lineSpacing
+    })
+
+    doc.save('Recipe.pdf')
+  }
+
+  img.onerror = function () {
+    console.error('Error loading image.')
+  }
+
+  img.src = logo // Set source after defining onload and onerror handlers
+}
+
+const printObjectivesE = (row) => {
+  const doc = new jsPDF()
+  const logo = 'src/assets/images-removebg-preview.png' // Path to your logo
+  const img = new Image()
+
+  img.onload = function () {
+    doc.addImage(img, 'PNG', 10, 10, 50, 50) // Adjust size as needed
+    let yPosition = 25
+    const lineSpacing = 5
+    doc.setFontSize(14) // Reduced font size
+    doc.setTextColor(0, 128, 128) // Teal color for Hospital name
+    doc.text('Fundación', 70, yPosition)
+    yPosition += 4 + lineSpacing // Move down for next line (font size + spacing)
+    doc.setFontSize(16)
+    doc.text('Hospital Adventista de Venezuela', 70, yPosition)
+    yPosition += 6 + lineSpacing
+    doc.setFontSize(12)
+    doc.setTextColor(0, 128, 128)
+    doc.text('Rif J-08517758-2', 70, yPosition)
+    const pacienteDetails = `Información de ${name.value} ${surname.value}`
+
+    const recipeDetails = `Objetivo: ${objetivo.value} ${row.objetivo}`
+
+    // Split text lines for patient and recipe details
+    const pacienteTextLines = doc.splitTextToSize(pacienteDetails, 190)
+    const recipeTextLines = doc.splitTextToSize(recipeDetails, 190)
+
+    // Add patient details
+    yPosition += 12 + lineSpacing // Adjust Y position after titles
+    pacienteTextLines.forEach((line) => {
+      doc.text(line, 5, yPosition)
+      yPosition += 14 + lineSpacing
+    })
+
+    recipeTextLines.forEach((line) => {
+      doc.text(line, 10, yPosition)
+      yPosition += 1 + lineSpacing
+    })
+
+    yPosition += 12 + lineSpacing
+    pacienteTextLines.forEach((line) => {
+      doc.text(line, 10, yPosition)
+      yPosition += 14 + lineSpacing
+    })
+
+    const medicoDetails = `fecha: ${fechaRegistro.value} firma: ______________`
+    const medicoTextLines = doc.splitTextToSize(medicoDetails, 190)
+    const pageHeight = doc.internal.pageSize.height
+    const paddingBottom = 20
+    const remainingSpace = pageHeight - yPosition - paddingBottom
+
+    if (remainingSpace < (medicoTextLines.length * (14 + lineSpacing))) {
+      doc.addPage()
+      yPosition = paddingBottom
+    } else {
+      yPosition += 12 + lineSpacing
+    }
+
+    medicoTextLines.forEach((line) => {
+      doc.text(line, 10, yPosition)
+      yPosition += 14 + lineSpacing // Adjust for line height and spacing
+    })
+
+    // Save the PDF
+    doc.save('Objetivo.pdf')
+  }
+
+  img.onerror = function () {
+    console.error('Error loading image.')
+  }
+
+  img.src = logo // Set source after defining onload and onerror handlers
+}
+const printRecipe = () => {
+  const doc = new jsPDF()
+  const logo = 'src/assets/images-removebg-preview.png' // Path to your logo
+  const img = new Image()
+
+  img.onload = function () {
+    doc.addImage(img, 'PNG', 10, 10, 50, 50) // Adjust size as needed
+    let yPosition = 25
+    const lineSpacing = 5
+
+    doc.setFontSize(14) // Reduced font size
+    doc.setTextColor(0, 128, 128) // Teal color for Hospital name
+    doc.text('Fundación', 70, yPosition)
+    yPosition += 4 + lineSpacing // Move down for next line (font size + spacing)
+
+    // Title: Hospital Adventista de Venezuela
+    doc.setFontSize(16)
+    doc.text('Hospital Adventista de Venezuela', 70, yPosition)
+    yPosition += 6 + lineSpacing
+
+    doc.setFontSize(12)
+    doc.setTextColor(0, 128, 128)
+    doc.text('Rif J-08517758-2', 70, yPosition)
+    const pacienteDetails = `Receta para: ${name.value} ${surname.value}`
+    const recipeDetails = `Recipe: ${recipe.value}`
+
+    const pacienteTextLines = doc.splitTextToSize(pacienteDetails, 190)
+    const recipeTextLines = doc.splitTextToSize(recipeDetails, 190)
+
+    yPosition += 12 + lineSpacing
+    pacienteTextLines.forEach((line) => {
+      doc.text(line, 10, yPosition)
+      yPosition += 14 + lineSpacing
+    })
+
+    recipeTextLines.forEach((line) => {
+      doc.text(line, 10, yPosition)
+      yPosition += 1 + lineSpacing
+    })
+
+    const medicoDetails = `Recipe: ${fechaRegistro.value} firma: ______________`
+    const medicoTextLines = doc.splitTextToSize(medicoDetails, 300)
+    yPosition += 12 + lineSpacing
+
+    medicoTextLines.forEach((line) => {
+      doc.text(line, 10, yPosition)
+      yPosition += 14 + lineSpacing
+    })
+
+    doc.save('Recipe.pdf')
+  }
+
+  img.onerror = function () {
+    console.error('Error loading image.')
+  }
+
+  img.src = logo
+}
+
+const printObjectives = () => {
+  const doc = new jsPDF()
+  const logo = 'src/assets/images-removebg-preview.png' // Path to your logo
+  const img = new Image()
+
+  img.onload = function () {
+    doc.addImage(img, 'PNG', 10, 10, 50, 50) // Adjust size as needed
+    let yPosition = 25
+    const lineSpacing = 5
+    doc.setFontSize(14) // Reduced font size
+    doc.setTextColor(0, 128, 128) // Teal color for Hospital name
+    doc.text('Fundación', 70, yPosition)
+    yPosition += 4 + lineSpacing // Move down for next line (font size + spacing)
+    doc.setFontSize(16)
+    doc.text('Hospital Adventista de Venezuela', 70, yPosition)
+    yPosition += 6 + lineSpacing
+    doc.setFontSize(12)
+    doc.setTextColor(0, 128, 128)
+    doc.text('Rif J-08517758-2', 70, yPosition)
+    const pacienteDetails = `Información de ${name.value} ${surname.value}`
+
+    const recipeDetails = `Objetivo: ${otros.value}`
+
+    // Split text lines for patient and recipe details
+    const pacienteTextLines = doc.splitTextToSize(pacienteDetails, 190)
+    const recipeTextLines = doc.splitTextToSize(recipeDetails, 190)
+
+    // Add patient details
+    yPosition += 12 + lineSpacing // Adjust Y position after titles
+    pacienteTextLines.forEach((line) => {
+      doc.text(line, 5, yPosition)
+      yPosition += 14 + lineSpacing
+    })
+
+    recipeTextLines.forEach((line) => {
+      doc.text(line, 10, yPosition)
+      yPosition += 1 + lineSpacing
+    })
+
+    yPosition += 12 + lineSpacing
+    pacienteTextLines.forEach((line) => {
+      doc.text(line, 10, yPosition)
+      yPosition += 14 + lineSpacing
+    })
+
+    const medicoDetails = `fecha: ${fechaRegistro.value} firma: ______________`
+    const medicoTextLines = doc.splitTextToSize(medicoDetails, 190)
+    const pageHeight = doc.internal.pageSize.height
+    const paddingBottom = 20
+    const remainingSpace = pageHeight - yPosition - paddingBottom
+
+    if (remainingSpace < (medicoTextLines.length * (14 + lineSpacing))) {
+      doc.addPage()
+      yPosition = paddingBottom
+    } else {
+      yPosition += 12 + lineSpacing
+    }
+
+    medicoTextLines.forEach((line) => {
+      doc.text(line, 10, yPosition)
+      yPosition += 14 + lineSpacing // Adjust for line height and spacing
+    })
+
+    // Save the PDF
+    doc.save('Objetivo.pdf')
+  }
+
+  img.onerror = function () {
+    console.error('Error loading image.')
+  }
+
+  img.src = logo // Set source after defining onload and onerror handlers
+}
+
+const printselect = () => {
+  dialogprint.value = true
+}
+const dialogprint = ref(false)
 const route = useRoute()
 const showPopup = ref(false)
 const isPwd = ref(true)
@@ -488,11 +743,6 @@ const handleClick = () => {
       </div>
 
     <div style="margin: 3%; display: flex; flex-wrap: wrap; gap: 20px;">
-        <p style="flex-basis: calc(33.33% - 20px); font-size: 1.1em; margin: 3px 0;"><strong>T.A:</strong> ${ta.value}</p>
-        <p style="flex-basis: calc(33.33% - 20px); font-size: 1.1em; margin: 3px 0;"><strong>F.C:</strong> ${fc.value}</p>
-        <p style="flex-basis: calc(33.33% - 20px); font-size: 1.1em; margin: 3px 0;"><strong>F.R:</strong> ${fr.value}</p>
-        <p style="flex-basis: calc(33.33% - 20px); font-size: 1.1em; margin: 3px 0;"><strong>T:</strong> ${t.value}</p>
-        <p style="flex-basis: calc(33.33% - 20px); font-size: 1.1em; margin: 3px 0;"><strong>Salt:</strong> ${salt.value}</p>
         <p style="flex-basis: 100%; font-size: 1.1em; margin: 3px 0;"><strong>Otros:</strong> ${otros.value}</p>
     </div>
 
@@ -622,6 +872,7 @@ const ver = (data) => {
   analisi.value = data.analisi || ''
   plant.value = data.plant || ''
   medicoE.value = data.medicoE || ''
+  recipes.value = data.recipes || ''
   fecha.value = data.fecha || ''
   showform.value = true
 }
@@ -640,14 +891,10 @@ const relationship = ref(route.query.relationship || '')
 const medico = ref(route.query.medico || '')
 const fechaRegistro = ref(route.query.fechaRegistro || '')
 const subjetivo = ref(route.query.subjetivo || '')
-const ta = ref(route.query.ta || '')
-const fc = ref(route.query.fc || '')
-const fr = ref(route.query.fr || '')
-const t = ref(route.query.t || '')
-const salt = ref(route.query.salt || '')
 const otros = ref(route.query.otros || '')
 const analisis = ref(route.query.analisis || '')
 const planterapeutico = ref(route.query.planterapeutico || '')
+const recipe = ref(route.query.recipe || '')
 
 const evolucionn = ref([])
 const cedula = ref('')
@@ -659,6 +906,7 @@ const analisi = ref('')
 const plant = ref('')
 const medicoE = ref('')
 const fecha = ref('')
+const recipes = ref('')
 
 const subjetivosEV = ref('')
 const objetivoEV = ref('')
@@ -666,7 +914,7 @@ const analisiEV = ref('')
 const plantEV = ref('')
 const medicoEEV = ref('')
 const fechaEV = ref('')
-
+const recipeEV = ref('')
 const cedulaEV = ref('')
 const edadEV = ref('')
 const fechaNEV = ref('')
@@ -727,6 +975,7 @@ async function save () {
       objetivo: objetivoEV.value,
       analisi: analisiEV.value,
       plant: plantEV.value,
+      recipes: recipeEV.value,
       medicoE: medicoEEV.value,
       fecha: new Date().toISOString(),
       usuarioregistro: medicoEEV.value
@@ -737,7 +986,6 @@ async function save () {
     currentInterconsulta.value += 1
     InterconsultaEV.value = `#${currentInterconsulta.value}`
 
-    // Calcular la fecha de vencimiento (10 años después)
     const fecha = new Date() // Fecha actual
     const fechaVencimiento = new Date(fecha)
     fechaVencimiento.setFullYear(fechaVencimiento.getFullYear() + 10)
