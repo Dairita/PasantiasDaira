@@ -385,7 +385,7 @@ import jsPDF from 'jspdf'
 
 const printRecipeE = (row) => {
   const doc = new jsPDF()
-  const logo = 'src/assets/images-removebg-preview.png' // Path to your logo
+  const logo = '~src/assets/images-removebg-preview.png' // Path to your logo
   const img = new Image()
 
   img.onload = function () {
@@ -444,7 +444,7 @@ const printRecipeE = (row) => {
 
 const printObjectivesE = (row) => {
   const doc = new jsPDF()
-  const logo = 'src/assets/images-removebg-preview.png' // Path to your logo
+  const logo = '~src/assets/images-removebg-preview.png' // Path to your logo
   const img = new Image()
 
   img.onload = function () {
@@ -517,7 +517,7 @@ const printObjectivesE = (row) => {
 }
 const printRecipe = () => {
   const doc = new jsPDF()
-  const logo = 'src/assets/images-removebg-preview.png' // Path to your logo
+  const logo = '~src/assets/images-removebg-preview.png' // Path to your logo
   const img = new Image()
 
   img.onload = function () {
@@ -576,7 +576,7 @@ const printRecipe = () => {
 
 const printObjectives = () => {
   const doc = new jsPDF()
-  const logo = 'src/assets/images-removebg-preview.png' // Path to your logo
+  const logo = '~src/assets/images-removebg-preview.png' // Path to your logo
   const img = new Image()
 
   img.onload = function () {
