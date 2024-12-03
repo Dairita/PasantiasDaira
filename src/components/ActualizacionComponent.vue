@@ -385,267 +385,222 @@ import jsPDF from 'jspdf'
 
 const printRecipeE = (row) => {
   const doc = new jsPDF()
-  const logo = '~src/assets/images-removebg-preview.png' // Path to your logo
-  const img = new Image()
+  let yPosition = 25
+  const lineSpacing = 5
 
-  img.onload = function () {
-    doc.addImage(img, 'PNG', 10, 10, 50, 50) // Adjust size as needed
-    let yPosition = 25
-    const lineSpacing = 5
+  doc.setFontSize(14) // Reduced font size
+  doc.setTextColor(0, 128, 128) // Teal color for Hospital name
+  doc.text('Fundación', 15, yPosition)
 
-    doc.setFontSize(14) // Reduced font size
-    doc.setTextColor(0, 128, 128) // Teal color for Hospital name
-    doc.text('Fundación', 70, yPosition)
-    yPosition += 4 + lineSpacing // Move down for next line (font size + spacing)
+  yPosition += 4 + lineSpacing // Move down for next line (font size + spacing)
 
-    // Title: Hospital Adventista de Venezuela
-    doc.setFontSize(16)
-    doc.text('Hospital Adventista de Venezuela', 70, yPosition)
-    yPosition += 6 + lineSpacing
+  doc.setFontSize(16)
+  doc.text('Hospital Adventista de Venezuela', 15, yPosition)
 
-    doc.setFontSize(12)
-    doc.setTextColor(0, 128, 128)
-    doc.text('Rif J-08517758-2', 70, yPosition)
-    const pacienteDetails = `Receta para: ${name.value} ${surname.value} ${recipes.value}`
-    const recipeDetails = `Recipe: ${recipes.value} ${row.recipes}`
+  yPosition += 6 + lineSpacing
+  doc.setFontSize(12)
+  doc.setTextColor(0, 128, 128)
+  doc.text('Rif J-08517758-2', 15, yPosition)
 
-    const pacienteTextLines = doc.splitTextToSize(pacienteDetails, 190)
-    const recipeTextLines = doc.splitTextToSize(recipeDetails, 190)
+  const recipeDetails = `Recipe: ${recipes.value} ${row.recipes}`
 
-    yPosition += 12 + lineSpacing
-    pacienteTextLines.forEach((line) => {
-      doc.text(line, 10, yPosition)
-      yPosition += 14 + lineSpacing
-    })
+  const recipeTextLines = doc.splitTextToSize(recipeDetails, 190)
 
-    recipeTextLines.forEach((line) => {
-      doc.text(line, 10, yPosition)
-      yPosition += 1 + lineSpacing
-    })
+  yPosition += 12 + lineSpacing
 
-    const medicoDetails = `Recipe: ${fechaRegistro.value} firma: ______________`
-    const medicoTextLines = doc.splitTextToSize(medicoDetails, 300)
-    yPosition += 12 + lineSpacing
+  recipeTextLines.forEach((line) => {
+    doc.text(line, 10, yPosition)
+    yPosition += 1 + lineSpacing
+  })
 
-    medicoTextLines.forEach((line) => {
-      doc.text(line, 10, yPosition)
-      yPosition += 14 + lineSpacing
-    })
+  const medicoDetails = 'firma: ______________'
+  const medicoTextLines = doc.splitTextToSize(medicoDetails, 300)
 
-    doc.save('Recipe.pdf')
-  }
+  yPosition += 12 + lineSpacing
 
-  img.onerror = function () {
-    console.error('Error loading image.')
-  }
+  medicoTextLines.forEach((line) => {
+    doc.text(line, 10, yPosition)
+    yPosition += 14 + lineSpacing
+  })
 
-  img.src = logo // Set source after defining onload and onerror handlers
+  // Save the PDF
+  doc.save('Recipe.pdf')
 }
 
 const printObjectivesE = (row) => {
   const doc = new jsPDF()
-  const logo = '~src/assets/images-removebg-preview.png' // Path to your logo
-  const img = new Image()
+  let yPosition = 25
+  const lineSpacing = 5
 
-  img.onload = function () {
-    doc.addImage(img, 'PNG', 10, 10, 50, 50) // Adjust size as needed
-    let yPosition = 25
-    const lineSpacing = 5
-    doc.setFontSize(14) // Reduced font size
-    doc.setTextColor(0, 128, 128) // Teal color for Hospital name
-    doc.text('Fundación', 70, yPosition)
-    yPosition += 4 + lineSpacing // Move down for next line (font size + spacing)
-    doc.setFontSize(16)
-    doc.text('Hospital Adventista de Venezuela', 70, yPosition)
-    yPosition += 6 + lineSpacing
-    doc.setFontSize(12)
-    doc.setTextColor(0, 128, 128)
-    doc.text('Rif J-08517758-2', 70, yPosition)
-    const pacienteDetails = `Información de ${name.value} ${surname.value}`
+  doc.setFontSize(14) // Reduced font size
+  doc.setTextColor(0, 128, 128) // Teal color for Hospital name
+  doc.text('Fundación', 15, yPosition)
 
-    const recipeDetails = `Objetivo: ${objetivo.value} ${row.objetivo}`
+  yPosition += 4 + lineSpacing // Move down for next line (font size + spacing)
 
-    // Split text lines for patient and recipe details
-    const pacienteTextLines = doc.splitTextToSize(pacienteDetails, 190)
-    const recipeTextLines = doc.splitTextToSize(recipeDetails, 190)
+  doc.setFontSize(16)
+  doc.text('Hospital Adventista de Venezuela', 15, yPosition)
 
-    // Add patient details
-    yPosition += 12 + lineSpacing // Adjust Y position after titles
-    pacienteTextLines.forEach((line) => {
-      doc.text(line, 5, yPosition)
-      yPosition += 14 + lineSpacing
-    })
+  yPosition += 6 + lineSpacing
+  doc.setFontSize(12)
+  doc.setTextColor(0, 128, 128)
+  doc.text('Rif J-08517758-2', 15, yPosition)
 
-    recipeTextLines.forEach((line) => {
-      doc.text(line, 10, yPosition)
-      yPosition += 1 + lineSpacing
-    })
+  const pacienteDetails = `Información de ${name.value} ${surname.value}`
+  const recipeDetails = `Objetivo: ${objetivo.value} ${row.objetivo}`
 
+  const pacienteTextLines = doc.splitTextToSize(pacienteDetails, 190)
+  const recipeTextLines = doc.splitTextToSize(recipeDetails, 190)
+
+  yPosition += 12 + lineSpacing // Adjust Y position after titles
+  pacienteTextLines.forEach((line) => {
+    doc.text(line, 5, yPosition)
+    yPosition += 14 + lineSpacing
+  })
+
+  recipeTextLines.forEach((line) => {
+    doc.text(line, 10, yPosition)
+    yPosition += 1 + lineSpacing
+  })
+
+  yPosition += 12 + lineSpacing
+  pacienteTextLines.forEach((line) => {
+    doc.text(line, 10, yPosition)
+    yPosition += 14 + lineSpacing
+  })
+
+  const medicoDetails = 'firma: ______________'
+  const medicoTextLines = doc.splitTextToSize(medicoDetails, 190)
+
+  const pageHeight = doc.internal.pageSize.height
+  const paddingBottom = 20
+  const remainingSpace = pageHeight - yPosition - paddingBottom
+
+  if (remainingSpace < (medicoTextLines.length * (14 + lineSpacing))) {
+    doc.addPage()
+    yPosition = paddingBottom
+  } else {
     yPosition += 12 + lineSpacing
-    pacienteTextLines.forEach((line) => {
-      doc.text(line, 10, yPosition)
-      yPosition += 14 + lineSpacing
-    })
-
-    const medicoDetails = `fecha: ${fechaRegistro.value} firma: ______________`
-    const medicoTextLines = doc.splitTextToSize(medicoDetails, 190)
-    const pageHeight = doc.internal.pageSize.height
-    const paddingBottom = 20
-    const remainingSpace = pageHeight - yPosition - paddingBottom
-
-    if (remainingSpace < (medicoTextLines.length * (14 + lineSpacing))) {
-      doc.addPage()
-      yPosition = paddingBottom
-    } else {
-      yPosition += 12 + lineSpacing
-    }
-
-    medicoTextLines.forEach((line) => {
-      doc.text(line, 10, yPosition)
-      yPosition += 14 + lineSpacing // Adjust for line height and spacing
-    })
-
-    // Save the PDF
-    doc.save('Objetivo.pdf')
   }
 
-  img.onerror = function () {
-    console.error('Error loading image.')
-  }
+  medicoTextLines.forEach((line) => {
+    doc.text(line, 10, yPosition)
+    yPosition += 14 + lineSpacing // Adjust for line height and spacing
+  })
 
-  img.src = logo // Set source after defining onload and onerror handlers
+  // Save the PDF
+  doc.save('Objetivo.pdf')
 }
+
 const printRecipe = () => {
   const doc = new jsPDF()
-  const logo = '~src/assets/images-removebg-preview.png' // Path to your logo
-  const img = new Image()
+  let yPosition = 25
+  const lineSpacing = 5
 
-  img.onload = function () {
-    doc.addImage(img, 'PNG', 10, 10, 50, 50) // Adjust size as needed
-    let yPosition = 25
-    const lineSpacing = 5
+  doc.setFontSize(14) // Reduced font size
+  doc.setTextColor(0, 128, 128) // Teal color for Hospital name
+  doc.text('Fundación', 15, yPosition)
 
-    doc.setFontSize(14) // Reduced font size
-    doc.setTextColor(0, 128, 128) // Teal color for Hospital name
-    doc.text('Fundación', 70, yPosition)
-    yPosition += 4 + lineSpacing // Move down for next line (font size + spacing)
+  yPosition += 4 + lineSpacing // Move down for next line (font size + spacing)
 
-    // Title: Hospital Adventista de Venezuela
-    doc.setFontSize(16)
-    doc.text('Hospital Adventista de Venezuela', 70, yPosition)
-    yPosition += 6 + lineSpacing
+  // Title: Hospital Adventista de Venezuela
+  doc.setFontSize(16)
+  doc.text('Hospital Adventista de Venezuela', 15, yPosition)
 
-    doc.setFontSize(12)
-    doc.setTextColor(0, 128, 128)
-    doc.text('Rif J-08517758-2', 70, yPosition)
-    const pacienteDetails = `Receta para: ${name.value} ${surname.value}`
-    const recipeDetails = `Recipe: ${recipe.value}`
+  yPosition += 6 + lineSpacing
+  doc.setFontSize(12)
+  doc.setTextColor(0, 128, 128)
+  doc.text('Rif J-08517758-2', 15, yPosition)
 
-    const pacienteTextLines = doc.splitTextToSize(pacienteDetails, 190)
-    const recipeTextLines = doc.splitTextToSize(recipeDetails, 190)
+  const recipeDetails = `Recipe: ${recipe.value}`
 
-    yPosition += 12 + lineSpacing
-    pacienteTextLines.forEach((line) => {
-      doc.text(line, 10, yPosition)
-      yPosition += 14 + lineSpacing
-    })
+  const recipeTextLines = doc.splitTextToSize(recipeDetails, 190)
 
-    recipeTextLines.forEach((line) => {
-      doc.text(line, 10, yPosition)
-      yPosition += 1 + lineSpacing
-    })
+  yPosition += 12 + lineSpacing
 
-    const medicoDetails = `Recipe: ${fechaRegistro.value} firma: ______________`
-    const medicoTextLines = doc.splitTextToSize(medicoDetails, 300)
-    yPosition += 12 + lineSpacing
+  recipeTextLines.forEach((line) => {
+    doc.text(line, 10, yPosition)
+    yPosition += 1 + lineSpacing
+  })
 
-    medicoTextLines.forEach((line) => {
-      doc.text(line, 10, yPosition)
-      yPosition += 14 + lineSpacing
-    })
+  const medicoDetails = 'firma: ______________'
+  const medicoTextLines = doc.splitTextToSize(medicoDetails, 300)
 
-    doc.save('Recipe.pdf')
-  }
+  yPosition += 12 + lineSpacing
 
-  img.onerror = function () {
-    console.error('Error loading image.')
-  }
+  medicoTextLines.forEach((line) => {
+    doc.text(line, 10, yPosition)
+    yPosition += 14 + lineSpacing
+  })
 
-  img.src = logo
+  // Save the PDF
+  doc.save('Recipe.pdf')
 }
 
 const printObjectives = () => {
   const doc = new jsPDF()
-  const logo = '~src/assets/images-removebg-preview.png' // Path to your logo
-  const img = new Image()
+  let yPosition = 25
+  const lineSpacing = 5
 
-  img.onload = function () {
-    doc.addImage(img, 'PNG', 10, 10, 50, 50) // Adjust size as needed
-    let yPosition = 25
-    const lineSpacing = 5
-    doc.setFontSize(14) // Reduced font size
-    doc.setTextColor(0, 128, 128) // Teal color for Hospital name
-    doc.text('Fundación', 70, yPosition)
-    yPosition += 4 + lineSpacing // Move down for next line (font size + spacing)
-    doc.setFontSize(16)
-    doc.text('Hospital Adventista de Venezuela', 70, yPosition)
-    yPosition += 6 + lineSpacing
-    doc.setFontSize(12)
-    doc.setTextColor(0, 128, 128)
-    doc.text('Rif J-08517758-2', 70, yPosition)
-    const pacienteDetails = `Información de ${name.value} ${surname.value}`
+  doc.setFontSize(14) // Reduced font size
+  doc.setTextColor(0, 128, 128) // Teal color for Hospital name
+  doc.text('Fundación', 15, yPosition)
 
-    const recipeDetails = `Objetivo: ${otros.value}`
+  yPosition += 4 + lineSpacing // Move down for next line (font size + spacing)
+  doc.setFontSize(16)
+  doc.text('Hospital Adventista de Venezuela', 15, yPosition)
 
-    // Split text lines for patient and recipe details
-    const pacienteTextLines = doc.splitTextToSize(pacienteDetails, 190)
-    const recipeTextLines = doc.splitTextToSize(recipeDetails, 190)
+  yPosition += 6 + lineSpacing
+  doc.setFontSize(12)
+  doc.setTextColor(0, 128, 128)
+  doc.text('Rif J-08517758-2', 15, yPosition)
 
-    // Add patient details
-    yPosition += 12 + lineSpacing // Adjust Y position after titles
-    pacienteTextLines.forEach((line) => {
-      doc.text(line, 5, yPosition)
-      yPosition += 14 + lineSpacing
-    })
+  const pacienteDetails = `Información de ${name.value} ${surname.value}`
+  const recipeDetails = `Objetivo: ${otros.value}`
 
-    recipeTextLines.forEach((line) => {
-      doc.text(line, 10, yPosition)
-      yPosition += 1 + lineSpacing
-    })
+  // Split text lines for patient and recipe details
+  const pacienteTextLines = doc.splitTextToSize(pacienteDetails, 190)
+  const recipeTextLines = doc.splitTextToSize(recipeDetails, 190)
 
+  // Add patient details
+  yPosition += 12 + lineSpacing // Adjust Y position after titles
+  pacienteTextLines.forEach((line) => {
+    doc.text(line, 5, yPosition)
+    yPosition += 14 + lineSpacing
+  })
+
+  recipeTextLines.forEach((line) => {
+    doc.text(line, 10, yPosition)
+    yPosition += 1 + lineSpacing
+  })
+
+  yPosition += 12 + lineSpacing
+  pacienteTextLines.forEach((line) => {
+    doc.text(line, 10, yPosition)
+    yPosition += 14 + lineSpacing
+  })
+
+  const medicoDetails = 'firma: ______________'
+  const medicoTextLines = doc.splitTextToSize(medicoDetails, 190)
+
+  const pageHeight = doc.internal.pageSize.height
+  const paddingBottom = 20
+  const remainingSpace = pageHeight - yPosition - paddingBottom
+
+  if (remainingSpace < (medicoTextLines.length * (14 + lineSpacing))) {
+    doc.addPage()
+    yPosition = paddingBottom
+  } else {
     yPosition += 12 + lineSpacing
-    pacienteTextLines.forEach((line) => {
-      doc.text(line, 10, yPosition)
-      yPosition += 14 + lineSpacing
-    })
-
-    const medicoDetails = `fecha: ${fechaRegistro.value} firma: ______________`
-    const medicoTextLines = doc.splitTextToSize(medicoDetails, 190)
-    const pageHeight = doc.internal.pageSize.height
-    const paddingBottom = 20
-    const remainingSpace = pageHeight - yPosition - paddingBottom
-
-    if (remainingSpace < (medicoTextLines.length * (14 + lineSpacing))) {
-      doc.addPage()
-      yPosition = paddingBottom
-    } else {
-      yPosition += 12 + lineSpacing
-    }
-
-    medicoTextLines.forEach((line) => {
-      doc.text(line, 10, yPosition)
-      yPosition += 14 + lineSpacing // Adjust for line height and spacing
-    })
-
-    // Save the PDF
-    doc.save('Objetivo.pdf')
   }
 
-  img.onerror = function () {
-    console.error('Error loading image.')
-  }
+  medicoTextLines.forEach((line) => {
+    doc.text(line, 10, yPosition)
+    yPosition += 14 + lineSpacing // Adjust for line height and spacing
+  })
 
-  img.src = logo // Set source after defining onload and onerror handlers
+  // Save the PDF
+  doc.save('Objetivo.pdf')
 }
 
 const printselect = () => {
